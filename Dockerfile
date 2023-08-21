@@ -6,11 +6,12 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # 作業ディレクトリを設定
-WORKDIR /work
+RUN mkdir /code
+WORKDIR /code
 
 # 依存関係をインストール
-COPY requirements.txt /work/
+ADD requirements.txt /code/
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # プロジェクトのファイルをコンテナにコピー
-COPY . /work/
+ADD . /work/
