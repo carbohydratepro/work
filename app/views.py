@@ -7,6 +7,6 @@ def display_calendar(request):
     template = loader.get_template('app/index.html')
     return HttpResponse(template.render())
 
-def date_specific_page(request, date):
+def detail(request, date):
     # ここで日付に基づいて必要な処理を行います。
-    return render(request, 'app/details.html', {'date': date})
+    return render(request, 'app/detail.html', {'date': date})

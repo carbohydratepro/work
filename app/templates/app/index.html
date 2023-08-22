@@ -1,16 +1,20 @@
-<html>
+{% load static %}
 
+
+<!DOCTYPE html>
+<html lang="ja">
 <head>
-    <meta charset='utf-8' />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css">
+    <link rel="stylesheet" href="{% static 'app/styles.css' %}">
 </head>
 
 <body>
-    <div id='calendar'></div>
-
-    {% load static %}
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js"></script>
-    <script src="{% static 'app/app.js' %}"></script>
+    <div id='calendar' class='m-5'>
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js"></script>
+        <script src="{% static 'app/app.js' %}"></script>
+    </div>
 </body>
 
 </html>

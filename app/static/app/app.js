@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var clickedDate = info.dateStr;
 
             // 新しいページに遷移するURLを構築
-            var newUrl = '/details/' + clickedDate;
+            var newUrl = '/calendar/details/' + clickedDate;
 
             // 新しいページに遷移
             window.location.href = newUrl;
