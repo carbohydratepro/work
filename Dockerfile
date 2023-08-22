@@ -10,8 +10,8 @@ RUN mkdir /code
 WORKDIR /code
 
 # 依存関係をインストール
-ADD requirements.txt /code/
+COPY requirements.txt /code/
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # プロジェクトのファイルをコンテナにコピー
-ADD . /work/
+COPY . /work/
