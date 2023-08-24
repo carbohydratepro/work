@@ -17,3 +17,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     calendar.render();
 });
+
+document.querySelector('.hamburger-menu').addEventListener('click', function() {
+    const navMenu = document.querySelector('.nav-menu');
+    if (navMenu.style.display === 'none' || navMenu.style.display === '') {
+        navMenu.style.display = 'block';
+    } else {
+        navMenu.style.display = 'none';
+    }
+});
