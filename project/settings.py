@@ -134,7 +134,9 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/calendar/'  # 例として、ホームページにリダイレクトする場合
+LOGIN_REDIRECT_URL = '/calendar/'
 LOGIN_URL = '/login/'
 
 AUTH_USER_MODEL = 'auth_app.CustomUser'
+
+LOGOUT_REDIRECT_URL = '/login'
