@@ -1,7 +1,8 @@
 from django.template import loader
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Shift
+from .forms import ShiftForm
 import json
 
 
@@ -26,7 +27,12 @@ def detail(request, date):
     return render(request, 'app/detail.html', context)
 
 def new(request):
-    return render(request, 'app/new.html')
+    if request.method == "POST":
+        form = ShiftForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('display_calendar')  # 仮にcalendarという名前のURLにリダイレクト
+    else:
+        form = ShiftForm()
 
-def create(request):
-    return render(request, 'app/create.html')
+    return render(request, 'app/new.html', {'form': form})
