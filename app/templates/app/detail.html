@@ -3,6 +3,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>日付詳細ページ</title>
@@ -10,5 +11,41 @@
 </head>
 <body>
     <h1>{{ date }}</h1>
+
+    <div id="plotly-div"></div>
+
+    <script>
+        const data = {{ data|safe }};
+        const trace = {
+            type: 'scatter',
+            mode: 'lines',
+            x: data.map(d => [d.Start, d.Finish, null]),
+            y: data.map((_, i) => [i, i, null]),
+            hoverinfo: 'x+y',
+            line: {
+                width: 20
+            }
+        };
+    
+        const layout = {
+            title: 'Gantt Chart',
+            showlegend: false,
+            xaxis: {
+                type: 'date',
+            },
+            yaxis: {
+                showgrid: true,
+                zeroline: false,
+            },
+            clickmode: 'event+select'
+        };
+    
+        Plotly.newPlot('plotly-div', [trace], layout);
+    
+        document.getElementById('plotly-div').on('plotly_click', function(data){
+            const shift_name = data.points[0].y;
+            alert(`You clicked on shift: ${shift_name}`);
+        });
+    </script>
 </body>
 </html>
