@@ -134,3 +134,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/'  # 例として、ホームページにリダイレクトする場合
 LOGIN_URL = '/login/'
+
+# ALLOWED_HOSTS = ['*']
