@@ -16,10 +16,27 @@
         <h2>Create New Shift</h2>
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
+
+            {{ form.applicant_name.label_tag }}: {{ form.applicant_name }}<br>
+            {{ form.substitute_name.label_tag }}: {{ form.substitute_name }}<br>
+            {{ form.date.label_tag }}: {{ form.date }}<br>
+
+            Start Time:
+            {{ form.start_hour }}
+            :
+            {{ form.start_minute }}<br>
+
+            End Time:
+            {{ form.end_hour }}
+            :
+            {{ form.end_minute }}<br>
+
+            {{ form.is_substitute_found.label_tag }}: {{ form.is_substitute_found }}<br>
+
             <button type="submit">Save</button>
         </form>
     {% endblock %}
+
 </body>
 </html>
 

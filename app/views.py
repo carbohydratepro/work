@@ -12,11 +12,15 @@ def display_calendar(request):
     return HttpResponse(template.render())
 
 def detail(request, date):
-    shifts = Shift.objects.all()
+    # 指定された日付のシフトのみをフィルタリング
+    shifts = Shift.objects.filter(date=date)
+
     data = [{
-        'shift': shift.name,
-        'Start': shift.start_time.strftime('%Y-%m-%d %H:%M'),
-        'Finish': shift.end_time.strftime('%Y-%m-%d %H:%M'),
+        'shift': shift.applicant_name,
+        'date':shift.date.strftime('%Y-%m-%d'),
+        'Start': shift.start_time.strftime('%H:%M'),
+        'Finish': shift.end_time.strftime('%H:%M'),
+        'substitute':shift.is_substitute_found,
         'Resource': 'Shift'
     } for shift in shifts]
     
@@ -30,8 +34,11 @@ def new(request):
     if request.method == "POST":
         form = ShiftForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('display_calendar')  # 仮にcalendarという名前のURLにリダイレクト
+            shift = form.save(commit=False)  # データベースにはまだ保存しない
+            shift.start_time = f"{form.cleaned_data['start_hour']}:{form.cleaned_data['start_minute']}"
+            shift.end_time = f"{form.cleaned_data['end_hour']}:{form.cleaned_data['end_minute']}"
+            shift.save()
+            return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
     else:
         form = ShiftForm()
 
