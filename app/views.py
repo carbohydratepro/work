@@ -14,6 +14,7 @@ def display_calendar(request):
 def detail(request, date):
     # 指定された日付のシフトのみをフィルタリング
     shifts = Shift.objects.filter(date=date)
+    
 
     data = [{
         'shift': shift.applicant_name,
@@ -23,6 +24,14 @@ def detail(request, date):
         'substitute':shift.is_substitute_found,
         'Resource': 'Shift'
     } for shift in shifts]
+    
+    # margin用のフェイクデータ追加
+    data.append(
+        {"shift": "", "date": date, "Start": "05:00", "Finish": "05:00", "substitute": False, "Resource": "Shift"}
+    )
+    data.append(
+        {"shift": "", "date": date, "Start": "23:00", "Finish": "23:00", "substitute": False, "Resource": "Shift"}
+    )
     
     context = {
         'data': json.dumps(data),

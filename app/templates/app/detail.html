@@ -33,7 +33,7 @@
                 text: d.shift,
                 line: {
                     width: 20,
-                    color: color
+                    color: color,
                 },
                 name: d.shift
             };
@@ -46,30 +46,27 @@
                 type: 'date',
                 range: [dataInput[0].date + " 5:30", dataInput[0].date + " 22:30"],
                 dtick: 3600000,
+                tickformat: '%H:%M',  // この行でx軸の日付を削除
+                tickangle:30,
                 showgrid: true,
-                fixedrange: true
+                fixedrange: true,
             },
             yaxis: {
                 showgrid: true,
                 zeroline: false,
                 tickvals: dataInput.map((_, i) => i),
                 ticktext: dataInput.map(d => d.shift),
-                fixedrange: true
+                fixedrange: true,
             },
             clickmode: 'event+select',
             dragmode: false,
             hovermode: 'closest',
-            margin: {  // グラフのマージンを調整して棒グラフ部分を中央に配置
-                l: 100,
-                r: 100,
-                b: 50,
-                t: 50,
-                pad: 4
-            },
-            bargap: 0.4  // グラフの棒部分の間隔を調整
+            bargap: 0.4,  // グラフの棒部分の間隔を調整
+            height: 100 + dataInput.length * 50,
         };
         
         const config = {
+            {% comment %} responsive: true, {% endcomment %}
             displayModeBar: false  // UIツールバーを非表示に
         };
         

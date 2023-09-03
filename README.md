@@ -10,3 +10,7 @@ django-admin startproject myproject
 ```text
 docker-compose up --build
 ```
+
+### 参考
+plotly
+https://qiita.com/studio_haneya/items/b689b4c27acbd12a888d
