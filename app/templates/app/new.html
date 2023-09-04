@@ -10,33 +10,51 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    
     {% include "app/_header.html" %}
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;  /* 水平方向の中央揃え */
+        }
+        .form-item {
+            margin-bottom: 10px;
+        }
+    </style>
 
-    {% block content %}
-        <h2>Create New Shift</h2>
-        <form method="post">
-            {% csrf_token %}
+    <div class="container">
+        <div class="centered-div">
+            {% block content %}
+                <h2>Create New Shift</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-item">
+                        {{ form.applicant_name.label_tag }} {{ form.applicant_name }}<br>
+                    </div>
 
-            {{ form.applicant_name.label_tag }}: {{ form.applicant_name }}<br>
-            {{ form.substitute_name.label_tag }}: {{ form.substitute_name }}<br>
-            {{ form.date.label_tag }}: {{ form.date }}<br>
+                    <div class="form-item">
+                        {{ form.date.label_tag }} {{ form.date }}<br>
+                    </div>
 
-            Start Time:
-            {{ form.start_hour }}
-            :
-            {{ form.start_minute }}<br>
+                    <div class="form-item">
+                        開始時刻:
+                        {{ form.start_hour }}
+                        :
+                        {{ form.start_minute }}<br>
+                    </div>
 
-            End Time:
-            {{ form.end_hour }}
-            :
-            {{ form.end_minute }}<br>
+                    <div class="form-item">
+                        終了時刻:
+                        {{ form.end_hour }}
+                        :
+                        {{ form.end_minute }}<br>
+                    </div>
 
-            {{ form.is_substitute_found.label_tag }}: {{ form.is_substitute_found }}<br>
-
-            <button type="submit">Save</button>
-        </form>
-    {% endblock %}
-
+                    <button type="submit">Save</button>
+                </form>
+            {% endblock %}
+        </div>
+    </div>
 </body>
 </html>
 
