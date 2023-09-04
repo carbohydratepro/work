@@ -1,9 +1,9 @@
 {% load static %}
 
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <title>カレンダー</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css">
@@ -15,15 +15,15 @@
     {% include "app/_header.html" %}
     
 
-    <div id='calendar' class='m-5'>
-        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js"></script>
-        <script src="{% static 'app/app.js' %}"></script>
-    </div>
+    <div id='calendar' class='m-5'></div>
     
     <!-- 新規投稿ページへの遷移ボタン -->
     <p>
         <button onclick='location.href="{% url "new" %}"'>新規投稿</button>
     </p>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js"></script>
+    <script src="{% static 'app/app.js' %}"></script>
 </body>
 
 </html>

@@ -1,0 +1,60 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <title>新規投稿ページ</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'app/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    
+    {% include "app/_header.html" %}
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;  /* 水平方向の中央揃え */
+        }
+        .form-item {
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <div class="container">
+        <div class="centered-div">
+            {% block content %}
+                <h2>Create New Shift</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-item">
+                        {{ form.applicant_name.label_tag }} {{ form.applicant_name }}<br>
+                    </div>
+
+                    <div class="form-item">
+                        {{ form.date.label_tag }} {{ form.date }}<br>
+                    </div>
+
+                    <div class="form-item">
+                        開始時刻:
+                        {{ form.start_hour }}
+                        :
+                        {{ form.start_minute }}<br>
+                    </div>
+
+                    <div class="form-item">
+                        終了時刻:
+                        {{ form.end_hour }}
+                        :
+                        {{ form.end_minute }}<br>
+                    </div>
+
+                    <button type="submit">Save</button>
+                </form>
+            {% endblock %}
+        </div>
+    </div>
+</body>
+</html>
+

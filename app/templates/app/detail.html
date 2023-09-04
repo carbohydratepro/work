@@ -3,12 +3,90 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <title>日付詳細ページ</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日付詳細ページ</title>
     <link rel="stylesheet" href="{% static 'app/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    {% include "app/_header.html" %}
+    
+    <div class="container">
     <h1>{{ date }}</h1>
+    <div id="plotly-div"></div>
+
+    <script>
+        const dataInput = {{ data|safe }};
+    
+        // 開始時間順にデータを逆ソート
+        dataInput.sort((a, b) => (a.date + " " + a.Start) < (b.date + " " + b.Start) ? 1 : -1);
+        
+        const traces = dataInput.map((d, i) => {
+            const color = d.substitute ? 'green' : 'red';  // substituteの値に応じて色を変える
+            return {
+                type: 'scatter',
+                mode: 'lines',
+                x: [d.date + " " + d.Start, d.date + " " + d.Finish],
+                y: [i, i],
+                hoverinfo: 'text',
+                text: d.shift,
+                line: {
+                    width: 20,
+                    color: color,
+                },
+                name: d.shift
+            };
+        });
+        
+        const layout = {
+            title: 'Gantt Chart',
+            showlegend: false,
+            xaxis: {
+                type: 'date',
+                range: [dataInput[0].date + " 5:30", dataInput[0].date + " 22:30"],
+                dtick: 3600000,
+                tickformat: '%H:%M',  // この行でx軸の日付を削除
+                tickangle:30,
+                showgrid: true,
+                fixedrange: true,
+            },
+            yaxis: {
+                showgrid: true,
+                zeroline: false,
+                tickvals: dataInput.map((_, i) => i),
+                ticktext: dataInput.map(d => d.shift),
+                fixedrange: true,
+            },
+            clickmode: 'event+select',
+            dragmode: false,
+            hovermode: 'closest',
+            bargap: 0.4,  // グラフの棒部分の間隔を調整
+            height: 100 + dataInput.length * 50,
+        };
+        
+        const config = {
+            {% comment %} responsive: true, {% endcomment %}
+            displayModeBar: false  // UIツールバーを非表示に
+        };
+        
+        Plotly.newPlot('plotly-div', traces, layout, config);
+        
+        document.getElementById('plotly-div').on('plotly_click', function(data){
+            const shift_name = data.points[0].text;
+            alert(`You clicked on shift: ${shift_name}`);
+        });
+    </script>
+    
+
+
+    
+    <!-- 新規投稿ページへの遷移ボタン -->
+    <p>
+        <button onclick='location.href="{% url "new" %}"'>新規投稿</button>
+    </p>
+    
+    <h1>{{ data }}</h1>
 </body>
 </html>
