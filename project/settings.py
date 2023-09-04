@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'auth_app.apps.AuthAppConfig',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'auth_app.middleware.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -132,7 +134,13 @@ STATIC_URL = '/app/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/'  # 例として、ホームページにリダイレクトする場合
+LOGIN_REDIRECT_URL = '/calendar/'
 LOGIN_URL = '/login/'
 
+
+AUTH_USER_MODEL = 'auth_app.CustomUser'
+
+LOGOUT_REDIRECT_URL = '/login'
+
 ALLOWED_HOSTS = ['*']
+
