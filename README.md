@@ -50,6 +50,29 @@ SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'mydataba
 docker-compose exec web python manage.py createsuperuser
 ```
 
+データベースの状態確認
+```text
+docker-compose exec web python manage.py showmigrations
+```
+※auth_appの0001_initialが[ ]だった場合
+```text
+project/setting.py
+INSTALLED_APPS = [
+    'django.contrib.admin' # この行をコメントアウト
+   :
+]
+project/urls.py
+urlpatterns = [
+    path('admin/', admin.site.urls), # この行をコメントアウト
+   :
+]
+
+1. docker-compose exec web python manage.py migrate
+2. コメントアウトをはずす
+3. docker-compose exec web python manage.py migrate
+エラーが生じなければ成功
+```
+
 ### 使用技術
    | 要素 | 名称 | バージョン |
    |---|---|---|
@@ -66,4 +89,9 @@ docker-compose exec web python manage.py createsuperuser
 ###### plotly
 ```text
 https://qiita.com/studio_haneya/items/b689b4c27acbd12a888d
+```
+
+###### user認証機能のバグ修正
+```text
+https://qlitre-weblog.com/cant-migrate-django-custom-user/
 ```
