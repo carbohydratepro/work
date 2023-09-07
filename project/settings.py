@@ -34,7 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'django.contrib.admin', # migrateができない場合はこの行を一旦コメントアウト & urlsのadminもコメントアウト
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
