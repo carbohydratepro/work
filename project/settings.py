@@ -135,12 +135,12 @@ STATIC_URL = '/app/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/calendar/'
-LOGIN_URL = '/login/'
+# LOGIN_URL = '/top/'
 
 
 AUTH_USER_MODEL = 'auth_app.CustomUser'
 
-LOGOUT_REDIRECT_URL = '/login'
+# LOGOUT_REDIRECT_URL = '/top/'
 
 ALLOWED_HOSTS = ['*']
 
