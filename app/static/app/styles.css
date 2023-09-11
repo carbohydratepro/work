@@ -12,7 +12,7 @@
     background-color: #333; /* ここに希望の色を指定してください */
     width: 100%;
     padding: 10px 15px;
-    text-align: right; /* テキストを左側に配置 */
+    text-align: left; /* テキストを左側に配置 */
 }
 .navbar a {
     margin-right: 10px;

@@ -1,4 +1,4 @@
-from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordChageDoneView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView
 from django.shortcuts import render, redirect, resolve_url
 from django.contrib.auth.decorators import login_required
 from django.views import generic
@@ -76,9 +76,9 @@ class Edit(OnlyYouMixin, generic.UpdateView):
 '''パスワード変更'''
 class PasswordChange(PasswordChangeView):
     form_class = MyPasswordChangeForm
-    success_url = reverse_lazy('account:password_change_done')
-    template_name = 'account/user_form.html'
-
+    success_url = reverse_lazy('password_change_done')
+    template_name = 'registration/user_form.html'
+    
     # contextデータ作成
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -88,4 +88,4 @@ class PasswordChange(PasswordChangeView):
 
 '''パスワード変更完了'''
 class PasswordChangeDone(PasswordChangeDoneView):
-    template_name = 'account/password_change_done.html'
+    template_name = 'registration/passwordchange_done.html'
