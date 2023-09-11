@@ -15,36 +15,9 @@
   </head>
   <body>
     <!-- ナビバー -->
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-      <a class="navbar-brand" href="{% url 'top' %}">テストサイト</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+    
+    {% include "registration/_header.html" %}
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'top' %}">Top</a>
-          </li>
-          {% if not user.is_authenticated %}
-            <li class="nav-item m-1">
-              <a class="nav-link" href="{% url 'login' %}">Log in</a>
-            </li>
-            <li class="nav-item m-1">
-              <a class="nav-link" href="{% url 'signup' %}">Sign up</a>
-            </li>
-          {% else %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'my_page' user.pk %}">My page</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'logout' %}">Log out</a>
-            </li>
-          {% endif %}
-        </ul>
-      </div>
-      
-    </nav>
     <!-- コンテンツ -->
     <div class="pl-4 small" style="background-color: #e2e3e5 ; border-bottom: solid 1px #f3f3f3;">
         {% if not user.is_authenticated %}
