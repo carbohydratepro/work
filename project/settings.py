@@ -34,7 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'django.contrib.admin', # migrateができない場合はこの行を一旦コメントアウト & urlsのadminもコメントアウト
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -52,7 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'auth_app.middleware.LoginRequiredMiddleware',
+    # 'auth_app.middleware.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -140,7 +140,7 @@ LOGIN_URL = '/login/'
 
 AUTH_USER_MODEL = 'auth_app.CustomUser'
 
-LOGOUT_REDIRECT_URL = '/login'
+LOGOUT_REDIRECT_URL = '/top/'
 
 ALLOWED_HOSTS = ['*']
 

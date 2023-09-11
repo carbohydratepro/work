@@ -12,7 +12,8 @@ class LoginRequiredMiddleware:
         return response
 
     def process_view(self, request, view_func, view_args, view_kwargs):
-        # ログインページやadminページへのアクセスは除外
-        if not request.user.is_authenticated and request.path not in [reverse('login'), '/admin/']:
-            return HttpResponseRedirect(reverse('login'))
+        # ログインページ, adminページ, トップページへのアクセスは除外
+        allowed_paths = [reverse('login'), '/admin/', reverse('top')]
+        if request.path not in allowed_paths:
+            return HttpResponseRedirect(reverse('top'))
         return None

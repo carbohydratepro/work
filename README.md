@@ -95,3 +95,8 @@ https://qiita.com/studio_haneya/items/b689b4c27acbd12a888d
 ```text
 https://qlitre-weblog.com/cant-migrate-django-custom-user/
 ```
+
+###### ユーザー認証機能の実装
+```text
+https://qiita.com/grv2688/items/a22df0c72e8a1ed10cb4
+```
