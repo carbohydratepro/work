@@ -52,7 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'auth_app.middleware.LoginRequiredMiddleware',
+    # 'auth_app.middleware.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -135,12 +135,12 @@ STATIC_URL = '/app/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/calendar/'
-# LOGIN_URL = '/top/'
+LOGIN_URL = '/login/'
 
 
 AUTH_USER_MODEL = 'auth_app.CustomUser'
 
-# LOGOUT_REDIRECT_URL = '/top/'
+LOGOUT_REDIRECT_URL = '/top/'
 
 ALLOWED_HOSTS = ['*']
 
