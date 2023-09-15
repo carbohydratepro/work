@@ -74,8 +74,12 @@
         Plotly.newPlot('plotly-div', traces, layout, config);
         
         document.getElementById('plotly-div').on('plotly_click', function(data){
-            const shift_name = data.points[0].text;
+            const idx = data.points[0].curveNumber
+            const shift_name = data.points[0].data.text;
             alert(`You clicked on shift: ${shift_name}`);
+            const edit_url = `/calendar/edit/${idx}/`;  // これは仮のURLパターンです。実際のURLパターンに合わせて変更してください。
+    
+            window.location.href = edit_url;
         });
     </script>
     

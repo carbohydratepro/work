@@ -25,12 +25,16 @@
     <div class="container">
         <div class="centered-div">
             {% block content %}
-                <h2>Create New Shift</h2>
+                {% if user.is_staff %}
+                    <h2>不足募集投稿フォーム</h2>
+
+                {% else %}
+                    <h2>出勤可能日登録フォーム</h2>
+
+                {% endif %}
+                
                 <form method="post">
                     {% csrf_token %}
-                    <div class="form-item">
-                        {{ form.applicant_name.label_tag }} {{ form.applicant_name }}<br>
-                    </div>
 
                     <div class="form-item">
                         {{ form.date.label_tag }} {{ form.date }}<br>

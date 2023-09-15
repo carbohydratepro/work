@@ -1,0 +1,5 @@
+<form method="post">
+    {% csrf_token %}
+    <p>{{ shift.name }} を削除しますか？</p>
+    <button type="submit">削除</button>
+</form>

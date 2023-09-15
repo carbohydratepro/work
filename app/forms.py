@@ -20,4 +20,5 @@ class ShiftForm(forms.ModelForm):
 
     class Meta:
         model = Shift
-        fields = ['applicant_name', 'substitute_name', 'date', 'start_hour', 'start_minute', 'end_hour', 'end_minute', 'is_substitute_found']
+        fields = ['date', 'start_hour', 'start_minute', 'end_hour', 'end_minute']
+

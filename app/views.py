@@ -1,6 +1,6 @@
 from django.template import loader
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Shift
 from .forms import ShiftForm
 from django.http import JsonResponse
@@ -73,7 +73,6 @@ def get_events(request):
 def detail(request, date):
     # 指定された日付のシフトのみをフィルタリング
     shifts = Shift.objects.filter(date=date)
-    
 
     data = [{
         'shift': shift.applicant_name,
@@ -99,10 +98,13 @@ def detail(request, date):
     return render(request, 'app/detail.html', context)
 
 def new(request):
+    user = request.user
     if request.method == "POST":
         form = ShiftForm(request.POST)
         if form.is_valid():
+            print("save")
             shift = form.save(commit=False)  # データベースにはまだ保存しない
+            shift.applicant_name = user.username
             shift.start_time = f"{form.cleaned_data['start_hour']}:{form.cleaned_data['start_minute']}"
             shift.end_time = f"{form.cleaned_data['end_hour']}:{form.cleaned_data['end_minute']}"
             shift.save()
@@ -111,3 +113,23 @@ def new(request):
         form = ShiftForm()
 
     return render(request, 'app/new.html', {'form': form})
+
+
+def edit(request, shift_id):
+    shift = get_object_or_404(Shift, pk=shift_id)
+    if request.method == "POST":
+        form = ShiftForm(request.POST, instance=shift)
+        if form.is_valid():
+            form.save()
+            return redirect('display-calendar')  # ここは適切なリダイレクト先に変更してください
+    else:
+        form = ShiftForm(instance=shift)
+    return render(request, 'app/edit.html', {'form': form})
+
+
+def delete(request, shift_id):
+    shift = get_object_or_404(Shift, pk=shift_id)
+    if request.method == "POST":
+        shift.delete()
+        return redirect('display-calendar')  # ここは適切なリダイレクト先に変更してください
+    return render(request, 'app/delete.html', {'shift': shift})
