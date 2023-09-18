@@ -11,7 +11,8 @@ class ShiftForm(forms.ModelForm):
 
     date = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date'}),
-        input_formats=['%Y-%m-%d']
+        input_formats=['%Y-%m-%d'],
+        label="日付"
     )
     start_hour = forms.ChoiceField(choices=HOUR_CHOICES, label='開始時')
     start_minute = forms.ChoiceField(choices=MINUTE_CHOICES, label='開始分')
