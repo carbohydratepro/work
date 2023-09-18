@@ -19,19 +19,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     failureCallback(error);
                 });
         },
-        dateClick: function(info) {
+        dateClick: async function(info) {
             // クリックされた日付を取得
             var clickedDate = info.dateStr;
 
-            // 新しいページに遷移するURLを構築
-            var newUrl = '/calendar/details/' + clickedDate;
+            // サーバーサイドでShiftモデルのデータが存在するか確認
+            let response = await fetch(`/calendar/check-shift-exists/${clickedDate}/`);
+            let data = await response.json();
 
-            // 新しいページに遷移
-            window.location.href = newUrl;
+            if (data.exists) {
+                // Shiftモデルのデータが存在する場合、ページ遷移を許可
+                var newUrl = '/calendar/details/' + clickedDate;
+                window.location.href = newUrl;
+            } else {
+                // Shiftモデルのデータが存在しない場合、遷移しない
+                // alert("選択された日付のシフトは存在しません。");
+            }
         }
     });
 
     calendar.render();
 });
+
+
+
+
+
 
 

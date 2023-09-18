@@ -67,8 +67,13 @@ def get_events(request):
 
     data = filtered_data
 
-
     return JsonResponse(data, safe=False)
+
+def check_shift_exists(request, date):
+    exists = Shift.objects.filter(date=date).exists()
+    print(exists)
+    return JsonResponse({'exists': exists})
+
 
 def detail(request, date):
     # 指定された日付のシフトのみをフィルタリング

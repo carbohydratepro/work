@@ -8,4 +8,5 @@ urlpatterns = [
     path('get-events/', views.get_events, name='get-events'),
     path('edit/<int:shift_id>/', views.edit, name='edit'),
     path('delete/<int:shift_id>/', views.delete, name='delete'),
+    path('check-shift-exists/<str:date>/', views.check_shift_exists, name='check_shift_exists'),
 ]
