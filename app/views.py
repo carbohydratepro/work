@@ -102,7 +102,6 @@ def new(request):
     if request.method == "POST":
         form = ShiftForm(request.POST)
         if form.is_valid():
-            print("save")
             shift = form.save(commit=False)  # データベースにはまだ保存しない
             shift.applicant_name = user.username
             shift.start_time = f"{form.cleaned_data['start_hour']}:{form.cleaned_data['start_minute']}"
