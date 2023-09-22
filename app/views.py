@@ -5,8 +5,16 @@ from .models import Shift
 from .forms import ShiftForm
 from django.http import JsonResponse
 from datetime import datetime
-import json
+from django.db import connection
 
+import json
+# import logging
+
+# logger = logging.getLogger(__name__)
+# def your_view(request):
+#     logger.debug('Debug message')
+#     logger.error('Error message')
+#     # ...
 
 def display_calendar(request):
     """カレンダーを表示"""
@@ -121,13 +129,19 @@ def new(request):
 
 
 def edit(request, shift_id):
+    user = request.user
     shift = get_object_or_404(Shift, pk=shift_id)
-    print(shift.date)
     if request.method == "POST":
         form = ShiftForm(request.POST, instance=shift)
         if form.is_valid():
-            form.save()
-            return redirect('display-calendar')
+            shift = form.save(commit=False)  # データベースにはまだ保存しない
+            shift.applicant_name = user.username
+            shift.start_time = f"{form.cleaned_data['start_hour']}:{form.cleaned_data['start_minute']}"
+            shift.end_time = f"{form.cleaned_data['end_hour']}:{form.cleaned_data['end_minute']}"
+            shift.save()
+            # print(connection.queries) # データベースの状態確認用
+            return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
+            
     else:
         form = ShiftForm(instance=shift)
     
