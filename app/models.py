@@ -9,7 +9,8 @@ class Shift(models.Model):
     start_time = models.TimeField(verbose_name="開始時間")
     end_time = models.TimeField(verbose_name="終了時間")
     is_substitute_found = models.BooleanField(default=False, verbose_name="代役が見つかっている")
-    # is_staff = models.BooleanField(default=False, verbose_name="スタッフアカウント")
+    is_confirmed = models.BooleanField(default=False, verbose_name="確定済み")
+    is_staff = models.BooleanField(default=False, verbose_name="スタッフアカウント")
 
     def __str__(self):
         return self.applicant_name
