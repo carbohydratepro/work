@@ -121,8 +121,6 @@ def new(request):
 
 
 def edit(request, shift_id):
-    print(Shift)
-    print(shift_id)
     shift = get_object_or_404(Shift, pk=shift_id)
     print(shift.date)
     if request.method == "POST":
@@ -132,7 +130,8 @@ def edit(request, shift_id):
             return redirect('display-calendar')
     else:
         form = ShiftForm(instance=shift)
-        return render(request, 'app/edit.html', {'form': form})
+    
+    return render(request, 'app/edit.html', {'form': form})
 
 
 def delete(request, shift_id):

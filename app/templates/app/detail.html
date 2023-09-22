@@ -61,9 +61,7 @@
             displayModeBar: false  // UIツールバーを非表示に
         };
         
-        Plotly.newPlot('plotly-div', traces, layout, config);
-        
-        console.log(dataInput)
+        Plotly.newPlot('plotly-div', traces, layout, config)
 
         document.getElementById('plotly-div').on('plotly_click', function(data){
             const idx = data.points[0].curveNumber;
