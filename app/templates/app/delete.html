@@ -1,5 +1,23 @@
-<form method="post">
-    {% csrf_token %}
-    <p>{{ shift.name }} を削除しますか？</p>
-    <button type="submit">削除</button>
-</form>
+{% extends "registration/base.html" %}
+
+<!-- コンテンツ -->
+{% block content %}
+<div class="container">
+  <div class="col-md-6 offset-md-3">
+    <div class="card mt-3 mb-3 bg-light">
+      <!-- カードヘッダー -->
+      <div class="card-header bg-primary text-light">
+        <h4>削除</h4>
+      </div>
+      <!-- カードボディー -->
+      <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <p>{{ shift.name }} を削除しますか？</p>
+            <button type="submit">削除</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,19 +1,9 @@
-{% load static %}
+{% extends "app/base.html" %}
 
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <title>日付詳細ページ</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'app/styles.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
-    {% include "app/_header.html" %}
-    
-    <div class="container">
+<!-- コンテンツ -->
+{% block content %}
+
+<div class="container">
     <h1>{{ date }}</h1>
     <div id="plotly-div"></div>
 
@@ -73,24 +63,15 @@
         
         Plotly.newPlot('plotly-div', traces, layout, config);
         
+        console.log(dataInput)
+
         document.getElementById('plotly-div').on('plotly_click', function(data){
-            const idx = data.points[0].curveNumber
-            const shift_name = data.points[0].data.text;
-            alert(`You clicked on shift: ${shift_name}`);
-            const edit_url = `/calendar/edit/${idx}/`; 
-    
+            const idx = data.points[0].curveNumber;
+            const shift_id = dataInput[idx].id;  // ここで Shift の ID を取得
+            const edit_url = `/calendar/edit/${shift_id}/`;
+
             window.location.href = edit_url;
         });
     </script>
-    
 
-
-    
-    <!-- 新規投稿ページへの遷移ボタン -->
-    <p>
-        <button onclick='location.href="{% url "new" %}"'>新規投稿</button>
-    </p>
-    
-    {% comment %} <h1>{{ data }}</h1> {% endcomment %}
-</body>
-</html>
+{% endblock %}

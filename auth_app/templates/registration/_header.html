@@ -1,29 +1,31 @@
 <!-- ナビバー -->
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <a class="navbar-brand" href="{% url 'top' %}">テストサイト</a>
+    <div class="d-flex justify-content-center align-items-center">
+      <i class="fas fa-2x fa-coffee text-white"></i>
+    </div>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'top' %}">Top</a>
+        <li class="nav-item m-1">
+          <a class="nav-link" href="{% url 'top' %}">トップ</a>
         </li>
         {% if not user.is_authenticated %}
           <li class="nav-item m-1">
-            <a class="nav-link" href="{% url 'login' %}">Log in</a>
+            <a class="nav-link" href="{% url 'login' %}">ログイン</a>
           </li>
           <li class="nav-item m-1">
-            <a class="nav-link" href="{% url 'signup' %}">Sign up</a>
+            <a class="nav-link" href="{% url 'signup' %}">サインアップ</a>
           </li>
 
         {% else %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'my_page' user.pk %}">My page</a>
+          <li class="nav-item m-1">
+            <a class="nav-link" href="{% url 'my_page' user.pk %}">マイページ</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'logout' %}">Log out</a>
+          <li class="nav-item m-1">
+            <a class="nav-link" href="{% url 'logout' %}">ログアウト</a>
           </li>
           <li class="nav-item m-1">
             <a class="nav-link" href="/calendar/">ホーム</a>

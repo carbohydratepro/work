@@ -1,5 +1,40 @@
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">編集を保存</button>
-</form>
+{% extends "app/base.html" %}
+
+<!-- コンテンツ -->
+{% block content %}
+<div class="container">
+  <div class="col-md-8 offset-md-2">
+    <div class="card p-3 mt-3 mb-3 bg-white">
+     <div class="text-center mt-3 mb-3 bg-white ">
+        <div class="text-center mt-3 mb-3 bg-white ">
+            <h2>編集フォーム</h2>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-item p-2 d-flex justify-content-center align-items-center">
+                日付　{{ form.date }}<br>
+            </div>
+
+            <div class="form-item p-2 d-flex justify-content-center align-items-center">
+                開始時刻　
+                {{ form.start_hour }}
+                ：
+                {{ form.start_minute }}<br>
+            </div>
+
+            <div class="form-item p-2 d-flex justify-content-center align-items-center">
+                終了時刻　
+                {{ form.end_hour }}
+                ：
+                {{ form.end_minute }}<br>
+            </div>
+
+            <button type="submit" class="btn mt-3 btn-outline-primary btn-block">編集を保存</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

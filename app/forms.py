@@ -3,7 +3,7 @@ from .models import Shift
 
 class ShiftForm(forms.ModelForm):
 
-    HOURS = [i for i in range(5, 23)]  # 5 to 22
+    HOURS = [i for i in range(6, 23)]  # 5 to 22
     MINUTES = [0, 10, 20, 30, 40, 50]
 
     HOUR_CHOICES = [(f"{hour:02d}", f"{hour:02d}") for hour in HOURS]

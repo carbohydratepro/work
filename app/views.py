@@ -80,6 +80,7 @@ def detail(request, date):
     shifts = Shift.objects.filter(date=date)
 
     data = [{
+        'id':shift.id,
         'shift': shift.applicant_name,
         'date':shift.date.strftime('%Y-%m-%d'),
         'Start': shift.start_time.strftime('%H:%M'),
@@ -120,20 +121,23 @@ def new(request):
 
 
 def edit(request, shift_id):
+    print(Shift)
+    print(shift_id)
     shift = get_object_or_404(Shift, pk=shift_id)
+    print(shift.date)
     if request.method == "POST":
         form = ShiftForm(request.POST, instance=shift)
         if form.is_valid():
             form.save()
-            return redirect('display-calendar')  # ここは適切なリダイレクト先に変更してください
+            return redirect('display-calendar')
     else:
         form = ShiftForm(instance=shift)
-    return render(request, 'app/edit.html', {'form': form})
+        return render(request, 'app/edit.html', {'form': form})
 
 
 def delete(request, shift_id):
     shift = get_object_or_404(Shift, pk=shift_id)
     if request.method == "POST":
         shift.delete()
-        return redirect('display-calendar')  # ここは適切なリダイレクト先に変更してください
+        return redirect('display-calendar')
     return render(request, 'app/delete.html', {'shift': shift})
