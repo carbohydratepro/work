@@ -113,8 +113,9 @@ def detail(request, date):
 
 def new(request):
     user = request.user
+    form_error = None
     if request.method == "POST":
-        form = ShiftForm(request.POST)
+        form = ShiftForm(request.POST or None)
         if form.is_valid():
             shift = form.save(commit=False)  # データベースにはまだ保存しない
             shift.applicant_name = user.username
@@ -122,17 +123,20 @@ def new(request):
             shift.end_time = f"{form.cleaned_data['end_hour']}:{form.cleaned_data['end_minute']}"
             shift.save()
             return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
+        else:
+            form_error = form.errors.as_text()  # エラーをテキストとして取得
     else:
         form = ShiftForm()
 
-    return render(request, 'app/new.html', {'form': form})
+    return render(request, 'app/edit.html', {'form': form, 'form_error': form_error})
 
 
 def edit(request, shift_id):
     user = request.user
     shift = get_object_or_404(Shift, pk=shift_id)
+    form_error = None
     if request.method == "POST":
-        form = ShiftForm(request.POST, instance=shift)
+        form = ShiftForm(request.POST or None, instance=shift)
         if form.is_valid():
             shift = form.save(commit=False)  # データベースにはまだ保存しない
             shift.applicant_name = user.username
@@ -141,11 +145,16 @@ def edit(request, shift_id):
             shift.save()
             # print(connection.queries) # データベースの状態確認用
             return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
+        else:
+            LOWEST_HOUR = 2
+            HIGHEST_HOUR = 8
+            form_error = form.errors.as_text()  # エラーをテキストとして取得
+            form_error = f"勤務時間が{LOWEST_HOUR}時間以上{HIGHEST_HOUR}時間以内になるように調整してください"
             
     else:
         form = ShiftForm(instance=shift)
     
-    return render(request, 'app/edit.html', {'form': form})
+    return render(request, 'app/edit.html', {'form': form, 'form_error': form_error})
 
 
 def delete(request, shift_id):
