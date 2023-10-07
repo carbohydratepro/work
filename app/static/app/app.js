@@ -40,3 +40,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
     calendar.render();
 });
+
+
+// ①Django側にPOST送信する際に記述する"お決まりのコード"
+const getCookie = (name) => {
+    if (document.cookie && document.cookie !== '') {
+        for (const cookie of document.cookie.split(';')) {
+            const [key, value] = cookie.trim().split('=');
+            if (key === name) {
+                return decodeURIComponent(value);
+            }
+        }
+    }
+};
+const csrftoken = getCookie('csrftoken');
+
+// ②選択されたセレクトメニュー情報をDjango側にPOST送信する
+document.addEventListener('DOMContentLoaded', (event) => {
+    const categoryList = document.getElementById('category_select');
+    if (categoryList) {
+        categoryList.addEventListener('change', handleCategoryChange);
+    }
+});
+function handleCategoryChange(event) {
+    // セレクトメニュー内の要素を取得する
+    const categoryList = document.getElementById('category_select');
+    const selectedCategory = categoryList.value;
+    // 非同期処理を記述する
+    async function send_view_type() {
+        const url = '/calendar/update_user_view_type';
+        let res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: `view_type=${selectedCategory}`  // big_categoryからview_typeに変更
+            });
+    }
+    // 定義した関数を実行する
+    send_view_type();
+};

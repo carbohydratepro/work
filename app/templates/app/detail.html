@@ -14,7 +14,9 @@
         dataInput.sort((a, b) => (a.date + " " + a.Start) < (b.date + " " + b.Start) ? 1 : -1);
         
         const traces = dataInput.map((d, i) => {
-            const color = d.substitute ? 'green' : 'red';  // substituteの値に応じて色を変える
+            const color = !d.is_confirmed && !d.is_staff ? 'green' : 
+                          d.is_confirmed ? 'grey' : 
+                          d.is_staff ? 'red' : 'blue';  // fallback color in case none of the conditions are met
             return {
                 type: 'scatter',
                 mode: 'lines',

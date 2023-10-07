@@ -1,11 +1,13 @@
 from django.template import loader
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Shift
-from .forms import ShiftForm
+from .forms import ShiftForm, ViewTypeForm
 from django.http import JsonResponse
 from datetime import datetime
 from django.db import connection
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 import json
 # import logging
@@ -16,10 +18,38 @@ import json
 #     logger.error('Error message')
 #     # ...
 
+
+@csrf_exempt
+def update_user_view_type(request):
+    if request.method == 'POST':
+        form = ViewTypeForm(request.POST)
+        if form.is_valid():
+            view_type = form.cleaned_data['view_type']
+            request.user.view_type = view_type
+            request.user.save()
+            return JsonResponse({'status': 'ok'})
+        else:
+            return JsonResponse({'status': 'error', 'errors': form.errors})
+    else:
+        form = ViewTypeForm()
+
+    return redirect("display-calendar")
+
 def display_calendar(request):
+    print(request.user.view_type)
+    print("ok")
     """カレンダーを表示"""
-    template = loader.get_template('app/index.html')
-    return HttpResponse(template.render())
+    if request.method == 'POST':
+        form = ViewTypeForm(request.POST)
+        if form.is_valid():
+            view_type = form.cleaned_data['view_type']
+            # ユーザーモデルを更新
+            request.user.view_type = view_type
+            request.user.save()
+    else:
+        form = ViewTypeForm()
+
+    return render(request, 'app/index.html', {'form': form})
 
 def get_events(request):
     start_date_str = request.GET.get('start')
@@ -46,9 +76,8 @@ def get_events(request):
         'start': event.date.strftime('%Y-%m-%d'),
         'overlap': False,
         'display': "background",
-        'color': 'green' if event.is_substitute_found else 'red'
+        'color': 'grey' if event.is_confirmed else ('red' if event.is_staff else 'green')
     } for event in events]
-
 
     # 重複するstart日付を特定
     duplicated_starts = set()
@@ -56,20 +85,27 @@ def get_events(request):
     for entry in data:
         start = entry['start']
         start_counts[start] = start_counts.get(start, 0) + 1
-        if start_counts[start] > 1:
+        if start_counts[start] > 0:
             duplicated_starts.add(start)
 
-    # 同じstart日付を持ち、'green'と'red'が両方存在する場合、'green'を削除
+    # 各日付に対して必要な色を決定する
     filtered_data = []
     for start in duplicated_starts:
-        green_exists = any(item for item in data if item['start'] == start and item['color'] == 'green')
-        red_exists = any(item for item in data if item['start'] == start and item['color'] == 'red')
-        
-        if green_exists and red_exists:
-            filtered_data.extend([item for item in data if not (item['start'] == start and item['color'] == 'green')])
+        relevant_items = [item for item in data if item['start'] == start]
+        color = request.user.view_type
+        if color == 'mix':
+            # 'mix' の場合は、色の優先順位は 灰色 < 緑色 < 赤色 とする
+            color_priority = {'grey': 0, 'green': 100, 'red': 200}
+            # 最も優先度の高い色を選択する
+            max_priority = max(color_priority[item['color']] for item in relevant_items)
+            # 最も優先度の高い色のアイテムのみをフィルタリングする
+            filtered_items = [item for item in relevant_items if color_priority[item['color']] == max_priority]
         else:
-            filtered_data.extend([item for item in data if item['start'] == start])
-            
+            # 'red', 'green', 'grey' のいずれかの場合は、指定された色のアイテムのみをフィルタリングする
+            filtered_items = [item for item in relevant_items if item['color'] == color]
+
+        filtered_data.extend(filtered_items)
+
     # 重複していないデータを追加
     filtered_data.extend([item for item in data if item['start'] not in duplicated_starts])
 
@@ -94,15 +130,17 @@ def detail(request, date):
         'Start': shift.start_time.strftime('%H:%M'),
         'Finish': shift.end_time.strftime('%H:%M'),
         'substitute':shift.is_substitute_found,
+        'is_staff': shift.is_staff,
+        'is_confirmed':shift.is_confirmed,
         'Resource': 'Shift'
     } for shift in shifts]
     
     # margin用のフェイクデータ追加
     data.append(
-        {"shift": "", "date": date, "Start": "05:00", "Finish": "05:00", "substitute": False, "Resource": "Shift"}
+        {"shift": "", "date": date, "Start": "05:00", "Finish": "05:00", "substitute": False, "is_staff": False, "is_confirmed": False, "Resource": "Shift"}
     )
     data.append(
-        {"shift": "", "date": date, "Start": "23:00", "Finish": "23:00", "substitute": False, "Resource": "Shift"}
+        {"shift": "", "date": date, "Start": "23:00", "Finish": "23:00", "substitute": False, "is_staff": False, "is_confirmed": False, "Resource": "Shift"}
     )
     
     context = {
@@ -121,6 +159,8 @@ def new(request):
             shift.applicant_name = user.username
             shift.start_time = f"{form.cleaned_data['start_hour']}:{form.cleaned_data['start_minute']}"
             shift.end_time = f"{form.cleaned_data['end_hour']}:{form.cleaned_data['end_minute']}"
+            if user.is_staff:
+                shift.is_staff = True
             shift.save()
             return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
         else:
@@ -128,7 +168,7 @@ def new(request):
     else:
         form = ShiftForm()
 
-    return render(request, 'app/edit.html', {'form': form, 'form_error': form_error})
+    return render(request, 'app/new.html', {'form': form, 'form_error': form_error})
 
 
 def edit(request, shift_id):
@@ -163,3 +203,6 @@ def delete(request, shift_id):
         shift.delete()
         return redirect('display-calendar')
     return render(request, 'app/delete.html', {'shift': shift})
+
+def test(request):
+    return render(request, 'app/test.html')
