@@ -2,7 +2,7 @@ from django.template import loader
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Shift
-from .forms import ShiftForm, ViewTypeForm
+from .forms import ShiftForm, ViewTypeForm, TestForm
 from django.http import JsonResponse
 from datetime import datetime
 from django.db import connection
@@ -205,4 +205,62 @@ def delete(request, shift_id):
     return render(request, 'app/delete.html', {'shift': shift})
 
 def test(request):
-    return render(request, 'app/test.html')
+    import torch
+    from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
+    from torch.optim import AdamW
+    
+    sentence=[
+        'アメリカには自由の女神がある。',
+        'アフリカの草原にはゾウがいる。',
+        '早起きして一日を有意義に過ごす。',
+        'パソコンが壊れたので買い替える。',
+        'リサイクルショップで中古の自転車を買う。',
+        '新品の電動自転車を購入する。'
+    ]
+    
+    model_name = "cl-tohoku/bert-large-japanese"
+    unmasker = pipeline('fill-mask', model=model_name)
+    results = None
+    
+    sentence_index = request.GET.get(key="sentence", default=0)
+    word_selected = request.GET.get(key="word", default="")
+    
+    form = TestForm()
+    if request.method == "POST":
+        if form.is_valid():
+        # 内容を取得する
+            sentence_index = int(form.cleaned_data.get("sentence"))
+            word_selected = form.cleaned_data.get("word")
+            
+
+    sentence_selected = sentence[int(sentence_index)]
+    form.fields['sentence'].initial = [sentence_selected]
+    
+    # 選択フォームの選択を取得した値で固定する
+    print(sentence_selected)
+    print(word_selected)
+
+
+    
+    
+    if (sentence_selected is not None and 
+        word_selected is not None and
+        word_selected in sentence_selected):
+        
+        text = sentence_selected.replace(word_selected, "[MASK]")
+        results = unmasker(text)
+
+        for result in results:
+            if isinstance(result, dict) and "token_str" in result:
+                token_str = result["token_str"]
+                score = result["score"]
+                print(f"{token_str}:{score:.5f}")
+                
+    context = {
+        "form": form,
+        "sentence_selected": sentence_selected,
+        "word_selected": word_selected,
+        "results": results,
+    }
+
+    return render(request, 'app/test.html', context)

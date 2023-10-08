@@ -1,0 +1,71 @@
+{% load static %}
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <title>カレンダー</title>
+    
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- 互換表示の解除 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'app/styles.css' %}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+        <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="{% static 'app/app.js' %}"></script>
+    
+  </head>
+  <body>
+    <div class="container">
+        <div class="col-md-8 offset-md-2">
+          <div class="card p-3 mt-3 mb-3 bg-white">
+              <div class="text-center mt-3 mb-3 bg-white ">
+                <h1>BERT体験</h1>
+              <form>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn mt-3 btn-outline-primary btn-block">更新</button>
+              </form>
+              
+              </div>
+            </div>
+
+            <div class="card p-3 mt-3 mb-3 bg-white">
+                <div class="text-center mt-3 mb-3 bg-white ">
+                    <h1>出力結果</h1>
+                    <div class="text-center mt-5 mb-4 bg-white ">
+                        <h3>文章：{{ sentence_selected }} </h3>
+                        <h3>単語：{{ word_selected }} </h3>
+                    </div>
+                    {% for result in results %}
+                        {% if result.token_str %}
+                            <h5>
+                                {{ result.token_str }}: {{ result.score|stringformat:".5f" }}
+                            </h5>
+                        {% endif %}
+                    {% endfor %}
+            
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+  </body>
+</html>
+
+
+
+
