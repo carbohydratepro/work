@@ -36,8 +36,6 @@ def update_user_view_type(request):
     return redirect("display-calendar")
 
 def display_calendar(request):
-    print(request.user.view_type)
-    print("ok")
     """カレンダーを表示"""
     if request.method == 'POST':
         form = ViewTypeForm(request.POST)
@@ -215,6 +213,7 @@ def test(request):
         '早起きして一日を有意義に過ごす。',
         'パソコンが壊れたので買い替える。',
         'リサイクルショップで中古の自転車を買う。',
+        '自由の女神がある国はアメリカである。',
         '新品の電動自転車を購入する。'
     ]
     
@@ -240,8 +239,6 @@ def test(request):
     print(sentence_selected)
     print(word_selected)
 
-
-    
     
     if (sentence_selected is not None and 
         word_selected is not None and
