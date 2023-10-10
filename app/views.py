@@ -36,7 +36,7 @@ def display_calendar(request):
     try:
         initial_view_type = request.user.view_type
     except AttributeError:
-        initial_view_type = "red"
+        initial_view_type = "mix"
 
     form = ViewTypeForm(initial={"view_type": initial_view_type})
     return render(request, 'app/index.html', {'form': form})
@@ -165,8 +165,15 @@ def edit(request, shift_id):
     user = request.user
     shift = get_object_or_404(Shift, pk=shift_id)
     form_error = None
+    initial = {
+        "date": shift.date,
+        "start_hour": shift.start_time.hour,
+        "start_minute": shift.start_time.minute,
+        "end_hour": shift.end_time.hour,
+        "end_minute": shift.end_time.minute,
+        }
     if request.method == "POST":
-        form = ShiftForm(request.POST or None, instance=shift)
+        form = ShiftForm(request.POST or None, instance=shift, initial=initial)
         if form.is_valid():
             shift = form.save(commit=False)  # データベースにはまだ保存しない
             shift.applicant_name = user.username
@@ -182,9 +189,9 @@ def edit(request, shift_id):
             form_error = f"勤務時間が{LOWEST_HOUR}時間以上{HIGHEST_HOUR}時間以内になるように調整してください"
             
     else:
-        form = ShiftForm(instance=shift)
+        form = ShiftForm(instance=shift, initial=initial)
     
-    return render(request, 'app/edit.html', {'form': form, 'form_error': form_error})
+    return render(request, 'app/edit.html', {'form': form, 'form_error': form_error, 'shift': shift})
 
 
 def delete(request, shift_id):
@@ -192,7 +199,6 @@ def delete(request, shift_id):
     if request.method == "POST":
         shift.delete()
         return redirect('display-calendar')
-    return render(request, 'app/delete.html', {'shift': shift})
 
 def test(request):
     import torch

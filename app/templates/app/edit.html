@@ -32,6 +32,10 @@
 
             <button type="submit" class="btn mt-3 btn-outline-primary btn-block">編集を保存</button>
         </form>
+        <form method="post" action="{% url 'delete' shift.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn mt-3 btn-outline-danger btn-block" onclick="return confirm('本当に削除しますか？')">削除</button>
+        </form>
       </div>
     </div>
   </div>
