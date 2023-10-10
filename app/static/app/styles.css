@@ -7,23 +7,4 @@
     background-color: rgba(0, 0, 0, 0.1); /* これは例としての色です。適切な色に変更してください。 */
 }
 
-/* ナビゲーションバーのスタイル */
-.navbar {
-    background-color: #333; /* ここに希望の色を指定してください */
-    width: 100%;
-    padding: 10px 15px;
-    text-align: left; /* テキストを左側に配置 */
-}
-.navbar a {
-    margin-right: 10px;
-    color: white; /* リンクのテキスト色を白に設定。必要に応じて変更してください */
-    text-decoration: none; /* アンダーラインを削除 */
-}
-.navbar a:hover {
-    text-decoration: underline; /* ホバー時にアンダーラインを表示 */
-}
-.navbar i {
-    color: white;
-    margin-right: 10px;
-}
 

@@ -29,27 +29,40 @@
     
   </head>
   <body>
-    <!-- ナビバー -->
-    
-    {% include "app/_header.html" %}
-  
-    <!-- コンテンツ -->
-    <div class="pl-4 small" style="background-color: #e2e3e5 ; border-bottom: solid 1px #f3f3f3;">
-        {% if not user.is_authenticated %}
-          こんにちは！ ゲスト さん
-        {% else %}
-          こんにちは！ {{ user.username }} さん
-        {% endif %}
-    </div>
-    <div class="m-3">
-      <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-      </form>
-    </div>
+    <div class="container">
+        <div class="col-md-8 offset-md-2">
+          <div class="card p-3 mt-3 mb-3 bg-white">
+              <div class="text-center mt-3 mb-3 bg-white ">
+                <h1>BERT体験</h1>
+              <form>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn mt-3 btn-outline-primary btn-block">更新</button>
+              </form>
+              
+              </div>
+            </div>
 
-    <div id='calendar' class='m-5'></div>
-  
+            <div class="card p-3 mt-3 mb-3 bg-white">
+                <div class="text-center mt-3 mb-3 bg-white ">
+                    <h1>出力結果</h1>
+                    <div class="text-center mt-5 mb-4 bg-white ">
+                        <h3>文章：{{ sentence_selected }} </h3>
+                        <h3>単語：{{ word_selected }} </h3>
+                    </div>
+                    {% for result in results %}
+                        {% if result.token_str %}
+                            <h5>
+                                {{ result.token_str }}: {{ result.score|stringformat:".5f" }}
+                            </h5>
+                        {% endif %}
+                    {% endfor %}
+            
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
   </body>
 </html>
 

@@ -3,3 +3,7 @@ psycopg2==2.8
 plotly
 pandas
 numpy
+torch
+transformers
+fugashi
+unidic-lite

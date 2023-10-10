@@ -5,12 +5,9 @@
 <div class="container">
   <div class="col-md-8 offset-md-2">
     <div class="card p-3 mt-3 mb-3 bg-white">
+     <div class="text-center mt-3 mb-3 bg-white ">
         <div class="text-center mt-3 mb-3 bg-white ">
-            {% if user.is_staff %}
-                <h2>不足募集投稿フォーム</h2>
-            {% else %}
-                <h2>出勤可能日登録フォーム</h2>
-            {% endif %}
+            <h2>編集フォーム</h2>
         </div>
         <form method="post">
             {% csrf_token %}
@@ -33,7 +30,11 @@
                 {{ form.end_minute }}<br>
             </div>
 
-            <button type="submit" class="btn mt-3 btn-outline-primary btn-block">新規登録</button>
+            <button type="submit" class="btn mt-3 btn-outline-primary btn-block">編集を保存</button>
+        </form>
+        <form method="post" action="{% url 'delete' shift.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn mt-3 btn-outline-danger btn-block" onclick="return confirm('本当に削除しますか？')">削除</button>
         </form>
       </div>
     </div>

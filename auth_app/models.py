@@ -23,7 +23,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(unique=True, max_length=50)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    
+
+    view_type = models.CharField(max_length=5, default='red')
+
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'username'

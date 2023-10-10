@@ -41,7 +41,7 @@ class Signup(generic.CreateView):
 
     def form_valid(self, form):
         user = form.save(commit=False)
-        user.is_staff = True
+        user.is_staff = False
         user.is_superuser = False
         user.save()
         return redirect('signup_done')
