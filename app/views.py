@@ -115,6 +115,7 @@ def detail(request, date):
 
     data = [{
         'id':shift.id,
+        'user_id': shift.user.id,
         'shift': shift.applicant_name,
         'date':shift.date.strftime('%Y-%m-%d'),
         'Start': shift.start_time.strftime('%H:%M'),
@@ -146,6 +147,7 @@ def new(request):
         form = ShiftForm(request.POST or None)
         if form.is_valid():
             shift = form.save(commit=False)  # データベースにはまだ保存しない
+            shift.user = user
             shift.applicant_name = user.username
             shift.start_time = f"{form.cleaned_data['start_hour']}:{form.cleaned_data['start_minute']}"
             shift.end_time = f"{form.cleaned_data['end_hour']}:{form.cleaned_data['end_minute']}"
