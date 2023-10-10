@@ -30,23 +30,15 @@ def update_user_view_type(request):
             return JsonResponse({'status': 'ok'})
         else:
             return JsonResponse({'status': 'error', 'errors': form.errors})
-    else:
-        form = ViewTypeForm()
-
-    return redirect("display-calendar")
+    return JsonResponse({'status': 'invalid_method'})
 
 def display_calendar(request):
-    """カレンダーを表示"""
-    if request.method == 'POST':
-        form = ViewTypeForm(request.POST)
-        if form.is_valid():
-            view_type = form.cleaned_data['view_type']
-            # ユーザーモデルを更新
-            request.user.view_type = view_type
-            request.user.save()
-    else:
-        form = ViewTypeForm()
+    try:
+        initial_view_type = request.user.view_type
+    except AttributeError:
+        initial_view_type = "red"
 
+    form = ViewTypeForm(initial={"view_type": initial_view_type})
     return render(request, 'app/index.html', {'form': form})
 
 def get_events(request):

@@ -63,7 +63,8 @@ class ViewTypeForm(forms.Form):
             ('mix', 'すべて表示')
         ],
         widget=forms.Select(attrs={'id': 'category_select'}),
-        required=True
+        required=True,
+        label="表示方法"
         )
 
 class TestForm(forms.Form):

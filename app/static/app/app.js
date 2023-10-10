@@ -67,6 +67,7 @@ function handleCategoryChange(event) {
     const categoryList = document.getElementById('category_select');
     const selectedCategory = categoryList.value;
     // 非同期処理を記述する
+
     async function send_view_type() {
         const url = '/calendar/update_user_view_type';
         let res = await fetch(url, {
@@ -77,7 +78,19 @@ function handleCategoryChange(event) {
                 },
                 body: `view_type=${selectedCategory}`  // big_categoryからview_typeに変更
             });
+    
+        // レスポンスをJSONとして解析
+        let data = await res.json();
+    
+        // statusが'ok'の場合、display-calendarにリダイレクト
+        if (data.status === 'ok') {
+            window.location.href = "/calendar/";
+        } else {
+            // エラー処理（必要に応じて）
+            console.error("Error updating view type:", data.errors);
+        }
     }
+    
     // 定義した関数を実行する
     send_view_type();
 };

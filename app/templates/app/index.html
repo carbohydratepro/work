@@ -41,10 +41,12 @@
           こんにちは！ {{ user.username }} さん
         {% endif %}
     </div>
-    <form method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-    </form>
+    <div class="m-3">
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+      </form>
+    </div>
 
     <div id='calendar' class='m-5'></div>
   

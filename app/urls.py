@@ -10,5 +10,5 @@ urlpatterns = [
     path('delete/<int:shift_id>/', views.delete, name='delete'),
     path('check-shift-exists/<str:date>/', views.check_shift_exists, name='check_shift_exists'),
     path('update_user_view_type', views.update_user_view_type, name='update_user_view_type'),
-    path('test', views.test, name='test'),
+    # path('test', views.test, name='test'),
 ]
