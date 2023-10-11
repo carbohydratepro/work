@@ -13,7 +13,8 @@ WORKDIR /code
 COPY requirements.txt /code/
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-RUN apt-get update && apt-get install -y mecab libmecab-dev mecab-ipadic-utf8
+# メモリを解放するためにキャッシュを削除
+RUN rm -rf /root/.cache/pip/
 
 # プロジェクトのファイルをコンテナにコピー
 COPY . /work/
