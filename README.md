@@ -100,3 +100,9 @@ https://qlitre-weblog.com/cant-migrate-django-custom-user/
 ```text
 https://qiita.com/grv2688/items/a22df0c72e8a1ed10cb4
 ```
+
+###### デプロイ
+```text
+https://zenn.dev/leon0305/articles/8518e520e3b5ca
+https://zenn.dev/tmasuyama1114/articles/ec2-linux-git-install
+```
