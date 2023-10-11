@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 class Shift(models.Model):
-    user = models.ForeignKey("auth_app.CustomUser", on_delete=models.CASCADE, null=True) 
+    user = models.ForeignKey("auth_app.CustomUser", on_delete=models.CASCADE, null=True)
     applicant_name = models.CharField(max_length=200, verbose_name="申請者の名前")
     substitute_name = models.CharField(max_length=200, verbose_name="代役の名前", blank=True, null=True)
     date = models.DateField(verbose_name="日付", default=timezone.now)
