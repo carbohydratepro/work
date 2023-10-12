@@ -82,7 +82,7 @@ urlpatterns = [
    | 言語 | HTML&CSS |  |
    | データベース | PostgeSQL |  |
    | クラウド/インフラ | DockerDesktop |  |
-   | クラウド/インフラ | AWS or GCP |  |
+   | クラウド/インフラ | AWS |  |
    | ライブラリ | 気が向いたら記述 |  |
    
 ### 参考
