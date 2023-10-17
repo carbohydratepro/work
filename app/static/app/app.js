@@ -76,7 +76,7 @@ function handleCategoryChange(event) {
                     'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
                     'X-CSRFToken': csrftoken,
                 },
-                body: `view_type=${selectedCategory}`  // big_categoryからview_typeに変更
+                body: `view_type=${selectedCategory}`
             });
     
         // レスポンスをJSONとして解析
