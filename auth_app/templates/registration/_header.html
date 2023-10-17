@@ -22,10 +22,10 @@
 
         {% else %}
           <li class="nav-item m-1">
-            <a class="nav-link" href="{% url 'my_page' user.pk %}">マイページ</a>
+            <a class="nav-link" href="/calendar/">ホーム</a>
           </li>
           <li class="nav-item m-1">
-            <a class="nav-link" href="/calendar/">ホーム</a>
+            <a class="nav-link" href="{% url 'my_page' user.pk %}">マイページ</a>
           </li>
           <li class="nav-item m-1">
             <a class="nav-link" href="{% url 'logout' %}">ログアウト</a>

@@ -69,14 +69,14 @@ function handleCategoryChange(event) {
     // 非同期処理を記述する
 
     async function send_view_type() {
-        const url = '/calendar/update_user_view_type';
+        const url = '/calendar/update_user_view_type/';
         let res = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
                     'X-CSRFToken': csrftoken,
                 },
-                body: `view_type=${selectedCategory}`  // big_categoryからview_typeに変更
+                body: `view_type=${selectedCategory}`
             });
     
         // レスポンスをJSONとして解析

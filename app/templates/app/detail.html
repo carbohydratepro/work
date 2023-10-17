@@ -10,7 +10,8 @@
     <script>
         const dataInput = {{ data|safe }};
         const currentUserId = {{ request.user.id }};  // 現在のユーザーIDを取得
-    
+        const is_staff = {{ is_staff|yesno:"true,false" }};
+
         // 開始時間順にデータを逆ソート
         dataInput.sort((a, b) => (a.date + " " + a.Start) < (b.date + " " + b.Start) ? 1 : -1);
 
@@ -74,6 +75,15 @@
             if (shift.user_id === currentUserId) {  // ShiftのユーザーIDと現在のユーザーIDが一致するか確認
                 const edit_url = `/calendar/edit/${shift.id}/`;
                 window.location.href = edit_url;
+            } else if (is_staff === true && shift.is_confirmed === false) {
+                const isConfirmed = confirm("このシフトを確定しますか？\n※この操作は取り消しできません。");
+                if (!isConfirmed) {
+                    // ユーザーが「キャンセル」を選択した場合、遷移をキャンセルする
+                    event.preventDefault();
+                } else {
+                    const confirm_url = `/calendar/confirm/${shift.id}/`;
+                    window.location.href = confirm_url;  
+                }
             }
         });
     </script>

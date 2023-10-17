@@ -110,6 +110,7 @@ def check_shift_exists(request, date):
 
 
 def detail(request, date):
+    user = request.user
     # 指定された日付のシフトのみをフィルタリング
     shifts = Shift.objects.filter(date=date)
 
@@ -137,6 +138,7 @@ def detail(request, date):
     context = {
         'data': json.dumps(data),
         'date': date,
+        'is_staff': user.is_staff,
     }
     return render(request, 'app/detail.html', context)
 
@@ -202,6 +204,16 @@ def delete(request, shift_id):
         shift.delete()
         return redirect('display-calendar')
 
+def confirm(request, shift_id):
+    user = request.user
+    shift = get_object_or_404(Shift, pk=shift_id)
+    if user.is_staff:
+        shift.is_confirmed = True
+        shift.save()
+    
+    return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
+    
+    
 def test(request):
     import torch
     from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
