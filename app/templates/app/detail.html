@@ -67,7 +67,6 @@
         
         Plotly.newPlot('plotly-div', traces, layout, config)
 
-
         document.getElementById('plotly-div').on('plotly_click', function(data){
             const idx = data.points[0].curveNumber;
             const shift = dataInput[idx];  // Shiftデータを取得
@@ -75,7 +74,16 @@
             if (shift.user_id === currentUserId) {  // ShiftのユーザーIDと現在のユーザーIDが一致するか確認
                 const edit_url = `/calendar/edit/${shift.id}/`;
                 window.location.href = edit_url;
-            } else if (is_staff === true && shift.is_confirmed === false) {
+            } else if (is_staff === true && shift.is_staff === false && shift.is_confirmed === false) {
+                const isConfirmed = confirm("このシフトを確定しますか？\n※この操作は取り消しできません。");
+                if (!isConfirmed) {
+                    // ユーザーが「キャンセル」を選択した場合、遷移をキャンセルする
+                    event.preventDefault();
+                } else {
+                    const confirm_url = `/calendar/confirm/${shift.id}/`;
+                    window.location.href = confirm_url;  
+                }
+            } else if (is_staff === false && shift.is_staff === true && shift.is_confirmed === false) {
                 const isConfirmed = confirm("このシフトを確定しますか？\n※この操作は取り消しできません。");
                 if (!isConfirmed) {
                     // ユーザーが「キャンセル」を選択した場合、遷移をキャンセルする

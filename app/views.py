@@ -1,6 +1,7 @@
 from django.template import loader
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from .models import Shift
 from .forms import ShiftForm, ViewTypeForm, TestForm
 from django.http import JsonResponse
@@ -19,6 +20,7 @@ import json
 #     # ...
 
 
+@login_required
 @csrf_exempt
 def update_user_view_type(request):
     if request.method == 'POST':
@@ -32,6 +34,7 @@ def update_user_view_type(request):
             return JsonResponse({'status': 'error', 'errors': form.errors})
     return JsonResponse({'status': 'invalid_method'})
 
+@login_required
 def display_calendar(request):
     try:
         initial_view_type = request.user.view_type
@@ -41,6 +44,7 @@ def display_calendar(request):
     form = ViewTypeForm(initial={"view_type": initial_view_type})
     return render(request, 'app/index.html', {'form': form})
 
+@login_required
 def get_events(request):
     start_date_str = request.GET.get('start')
     end_date_str = request.GET.get('end')
@@ -103,12 +107,13 @@ def get_events(request):
 
     return JsonResponse(data, safe=False)
 
+@login_required
 def check_shift_exists(request, date):
     exists = Shift.objects.filter(date=date).exists()
     print(exists)
     return JsonResponse({'exists': exists})
 
-
+@login_required
 def detail(request, date):
     user = request.user
     # 指定された日付のシフトのみをフィルタリング
@@ -117,11 +122,11 @@ def detail(request, date):
     data = [{
         'id':shift.id,
         'user_id': shift.user.id,
-        'shift': shift.applicant_name,
+        'shift': shift.substitute_name if shift.substitute_name else shift.applicant_name,
         'date':shift.date.strftime('%Y-%m-%d'),
         'Start': shift.start_time.strftime('%H:%M'),
         'Finish': shift.end_time.strftime('%H:%M'),
-        'substitute':shift.is_substitute_found,
+        'substitute_name':shift.substitute_name,
         'is_staff': shift.is_staff,
         'is_confirmed':shift.is_confirmed,
         'Resource': 'Shift'
@@ -129,10 +134,10 @@ def detail(request, date):
     
     # margin用のフェイクデータ追加
     data.append(
-        {"shift": "", "date": date, "Start": "05:00", "Finish": "05:00", "substitute": False, "is_staff": False, "is_confirmed": False, "Resource": "Shift"}
+        {"shift": "", "date": date, "Start": "05:00", "Finish": "05:00", "substitute_name": "", "is_staff": False, "is_confirmed": False, "Resource": "Shift"}
     )
     data.append(
-        {"shift": "", "date": date, "Start": "23:00", "Finish": "23:00", "substitute": False, "is_staff": False, "is_confirmed": False, "Resource": "Shift"}
+        {"shift": "", "date": date, "Start": "23:00", "Finish": "23:00", "substitute": "", "is_staff": False, "is_confirmed": False, "Resource": "Shift"}
     )
     
     context = {
@@ -142,6 +147,7 @@ def detail(request, date):
     }
     return render(request, 'app/detail.html', context)
 
+@login_required
 def new(request):
     user = request.user
     form_error = None
@@ -164,7 +170,7 @@ def new(request):
 
     return render(request, 'app/new.html', {'form': form, 'form_error': form_error})
 
-
+@login_required
 def edit(request, shift_id):
     user = request.user
     shift = get_object_or_404(Shift, pk=shift_id)
@@ -197,23 +203,29 @@ def edit(request, shift_id):
     
     return render(request, 'app/edit.html', {'form': form, 'form_error': form_error, 'shift': shift})
 
-
+@login_required
 def delete(request, shift_id):
     shift = get_object_or_404(Shift, pk=shift_id)
     if request.method == "POST":
         shift.delete()
         return redirect('display-calendar')
 
+@login_required
 def confirm(request, shift_id):
     user = request.user
     shift = get_object_or_404(Shift, pk=shift_id)
     if user.is_staff:
         shift.is_confirmed = True
         shift.save()
+    else:
+        shift.is_confirmed = True
+        shift.substitute_name = user.username
+        shift.save()
     
     return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
     
-    
+
+@login_required
 def test(request):
     import torch
     from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
