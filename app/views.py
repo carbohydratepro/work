@@ -20,6 +20,10 @@ import json
 #     # ...
 
 
+LOWEST_HOUR = 2
+HIGHEST_HOUR = 8
+
+
 @login_required
 @csrf_exempt
 def update_user_view_type(request):
@@ -161,10 +165,13 @@ def new(request):
             shift.end_time = f"{form.cleaned_data['end_hour']}:{form.cleaned_data['end_minute']}"
             if user.is_staff:
                 shift.is_staff = True
+            else:
+                shift.is_staff = False
             shift.save()
             return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
         else:
             form_error = form.errors.as_text()  # エラーをテキストとして取得
+            form_error = f"勤務時間が{LOWEST_HOUR}時間以上{HIGHEST_HOUR}時間以内になるように調整してください"
     else:
         form = ShiftForm()
 
@@ -193,8 +200,6 @@ def edit(request, shift_id):
             # print(connection.queries) # データベースの状態確認用
             return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
         else:
-            LOWEST_HOUR = 2
-            HIGHEST_HOUR = 8
             form_error = form.errors.as_text()  # エラーをテキストとして取得
             form_error = f"勤務時間が{LOWEST_HOUR}時間以上{HIGHEST_HOUR}時間以内になるように調整してください"
             
