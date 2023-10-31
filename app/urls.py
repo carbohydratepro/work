@@ -12,6 +12,7 @@ urlpatterns = [
     path('check-shift-exists/<str:date>/', views.check_shift_exists, name='check_shift_exists'),
     path('update_user_view_type/', views.update_user_view_type, name='update_user_view_type'),
     path('confirm/<int:shift_id>/', views.confirm, name='confirm'),
-    path('admin/', admin.site.urls),
+    path('list/', views.list, name='list'),
+    path('carbohydrate/', admin.site.urls),
     # path('test', views.test, name='test'),
 ]

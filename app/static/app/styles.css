@@ -7,4 +7,6 @@
     background-color: rgba(0, 0, 0, 0.1); /* これは例としての色です。適切な色に変更してください。 */
 }
 
-
+html, body {
+    height: 100%;
+}

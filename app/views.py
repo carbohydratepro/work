@@ -9,6 +9,8 @@ from datetime import datetime
 from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.utils import timezone
+from django.core.paginator import Paginator
 
 import json
 # import logging
@@ -228,7 +230,22 @@ def confirm(request, shift_id):
         shift.save()
     
     return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
-    
+
+
+@login_required
+def list(request):
+    # ログイン中のユーザーのシフトを日付の新しい順に取得
+    shifts = Shift.objects.filter(user=request.user).order_by('-date')
+    paginator = Paginator(shifts, 10)  # 10件ずつ表示するページネーター
+
+    page = request.GET.get('page')  # 現在のページ番号を取得
+    shifts = paginator.get_page(page)  # ページに対応するシフトを取得
+    context = {
+        'shifts': shifts,
+        'today': timezone.now().date()  # 今日の日付をcontextに追加
+    }
+    return render(request, 'app/list.html', context)
+
 
 @login_required
 def test(request):

@@ -1,0 +1,50 @@
+{% extends "app/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>My Shifts</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>日付</th>
+                <th>開始時間</th>
+                <th>終了時間</th>
+                <th>代役名</th>
+                <th>ステータス</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for shift in shifts %}
+            <tr style="background-color: 
+                {% if shift.date >= today and shift.is_confirmed %}#ffe0e0
+                {% elif shift.date <= today %}#e8e8e8  {# より薄い灰色に変更 #}
+                {% else %}#ffffff{% endif %};">
+                <td>{{ shift.date }}</td>
+                <td>{{ shift.start_time }}</td>
+                <td>{{ shift.end_time }}</td>
+                <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
+                <td>{% if shift.is_confirmed %}Yes{% else %}No{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="m-3 pagination">
+        <span class="step-links">
+            {% if shifts.has_previous %}
+                <a href="?page=1">&laquo; 最初</a>
+                <a href="?page={{ shifts.previous_page_number }}">前</a>
+            {% endif %}
+
+            <span class="current">
+                ページ {{ shifts.number }} / {{ shifts.paginator.num_pages }}
+            </span>
+
+            {% if shifts.has_next %}
+                <a href="?page={{ shifts.next_page_number }}">次</a>
+                <a href="?page={{ shifts.paginator.num_pages }}">最後 &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+{% endblock %}
