@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 import json
 # import logging
@@ -223,9 +224,12 @@ def confirm(request, shift_id):
     shift = get_object_or_404(Shift, pk=shift_id)
     if user.is_staff:
         shift.is_confirmed = True
+        shift.substitute_user = shift.user
+        shift.substitute_name = shift.user.username
         shift.save()
     else:
         shift.is_confirmed = True
+        shift.substitute_user = user
         shift.substitute_name = user.username
         shift.save()
     
@@ -235,7 +239,7 @@ def confirm(request, shift_id):
 @login_required
 def list(request):
     # ログイン中のユーザーのシフトを日付の新しい順に取得
-    shifts = Shift.objects.filter(user=request.user).order_by('-date')
+    shifts = Shift.objects.filter(Q(user=request.user) | Q(substitute_user=request.user)).order_by('-date')
     paginator = Paginator(shifts, 10)  # 10件ずつ表示するページネーター
 
     page = request.GET.get('page')  # 現在のページ番号を取得

@@ -23,7 +23,7 @@
                 <td>{{ shift.start_time }}</td>
                 <td>{{ shift.end_time }}</td>
                 <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
-                <td>{% if shift.is_confirmed %}Yes{% else %}No{% endif %}</td>
+                <td>{% if shift.is_confirmed %}確定済み{% else %}未確定{% endif %}</td>
             </tr>
             {% endfor %}
         </tbody>

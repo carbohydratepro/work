@@ -24,7 +24,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    view_type = models.CharField(max_length=5, default='red')
+    view_type = models.CharField(max_length=5, default='mix')
 
     objects = CustomUserManager()
 
