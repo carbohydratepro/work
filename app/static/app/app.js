@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
+        
+        // contentHeight: AuthenticatorAssertionResponse,
         events: function(fetchInfo, successCallback, failureCallback) {
             // fetchInfo には start と end の日付情報が含まれています。
             var startStr = fetchInfo.startStr;

@@ -8,6 +8,10 @@
     <div id="plotly-div"></div>
 
     <script>
+        function getDtickValue() {
+            // If the window width is less than 768px (typical breakpoint for smartphones), set dtick for 3 hours, else 1 hour.
+            return window.innerWidth < 768 ? 10800000 : 3600000;
+        }
         const dataInput = {{ data|safe }};
         const currentUserId = {{ request.user.id }};  // 現在のユーザーIDを取得
         const is_staff = {{ is_staff|yesno:"true,false" }};
@@ -40,7 +44,7 @@
             xaxis: {
                 type: 'date',
                 range: [dataInput[0].date + " 5:30", dataInput[0].date + " 22:30"],
-                dtick: 3600000,
+                dtick: getDtickValue(),
                 tickformat: '%H:%M',  // この行でx軸の日付を削除
                 tickangle:30,
                 showgrid: true,
