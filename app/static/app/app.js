@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        
+        height: "auto",
+
         // contentHeight: AuthenticatorAssertionResponse,
         events: function(fetchInfo, successCallback, failureCallback) {
             // fetchInfo には start と end の日付情報が含まれています。
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     failureCallback(error);
                 });
         },
+        
         dateClick: async function(info) {
             // クリックされた日付を取得
             var clickedDate = info.dateStr;
@@ -37,10 +39,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Shiftモデルのデータが存在しない場合、遷移しない
                 // alert("選択された日付のシフトは存在しません。");
             }
-        }
-    });
+        },
 
+        // viewDidMount: function(view, element) {
+        //     var cellWidth = $('.fc-day').width();
+  
+        //     // 日付セルの高さを新しい高さに設定
+        //     $('.fc-day').height(26.5);
+        //   }
+        });
+      
     calendar.render();
+
 });
 
 
