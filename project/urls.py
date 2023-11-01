@@ -18,7 +18,7 @@ from django.urls import path, include
 from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
-    path('admin/', admin.site.urls), # この行をコメントアウト
+    path('carbohydrate/', admin.site.urls), # この行をコメントアウト
     path('calendar/', include('app.urls')),
     path('', include('auth_app.urls')),
 ]

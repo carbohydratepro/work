@@ -9,6 +9,9 @@ from datetime import datetime
 from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.utils import timezone
+from django.core.paginator import Paginator
+from django.db.models import Q
 
 import json
 # import logging
@@ -18,6 +21,10 @@ import json
 #     logger.debug('Debug message')
 #     logger.error('Error message')
 #     # ...
+
+
+LOWEST_HOUR = 2
+HIGHEST_HOUR = 8
 
 
 @login_required
@@ -161,10 +168,13 @@ def new(request):
             shift.end_time = f"{form.cleaned_data['end_hour']}:{form.cleaned_data['end_minute']}"
             if user.is_staff:
                 shift.is_staff = True
+            else:
+                shift.is_staff = False
             shift.save()
             return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
         else:
             form_error = form.errors.as_text()  # エラーをテキストとして取得
+            form_error = f"勤務時間が{LOWEST_HOUR}時間以上{HIGHEST_HOUR}時間以内になるように調整してください"
     else:
         form = ShiftForm()
 
@@ -193,8 +203,6 @@ def edit(request, shift_id):
             # print(connection.queries) # データベースの状態確認用
             return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
         else:
-            LOWEST_HOUR = 2
-            HIGHEST_HOUR = 8
             form_error = form.errors.as_text()  # エラーをテキストとして取得
             form_error = f"勤務時間が{LOWEST_HOUR}時間以上{HIGHEST_HOUR}時間以内になるように調整してください"
             
@@ -216,14 +224,32 @@ def confirm(request, shift_id):
     shift = get_object_or_404(Shift, pk=shift_id)
     if user.is_staff:
         shift.is_confirmed = True
+        shift.substitute_user = shift.user
+        shift.substitute_name = shift.user.username
         shift.save()
     else:
         shift.is_confirmed = True
+        shift.substitute_user = user
         shift.substitute_name = user.username
         shift.save()
     
     return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
-    
+
+
+@login_required
+def list(request):
+    # ログイン中のユーザーのシフトを日付の新しい順に取得
+    shifts = Shift.objects.filter(Q(user=request.user) | Q(substitute_user=request.user)).order_by('-date')
+    paginator = Paginator(shifts, 10)  # 10件ずつ表示するページネーター
+
+    page = request.GET.get('page')  # 現在のページ番号を取得
+    shifts = paginator.get_page(page)  # ページに対応するシフトを取得
+    context = {
+        'shifts': shifts,
+        'today': timezone.now().date()  # 今日の日付をcontextに追加
+    }
+    return render(request, 'app/list.html', context)
+
 
 @login_required
 def test(request):

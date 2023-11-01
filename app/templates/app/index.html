@@ -41,15 +41,40 @@
           こんにちは！ {{ user.username }} さん
         {% endif %}
     </div>
-    <div class="m-3">
-      <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-      </form>
+    <div class="container">
+      <div class="row m-3">
+        <div class="col-4">
+          <form method="post">
+              {% csrf_token %}
+              {{ form.as_p }}
+          </form>
+        </div>
+        <div class "col-8">
+          <div class="container">
+            <div class="row">
+              <div class="col-4 d-flex justify-content-start align-items-center mb-3" style="white-space: nowrap; overflow: hidden;">
+                <div style="width: 20px; height: 20px; background-color: rgba(255, 0, 0, 0.7); border-radius: 50%; margin-right: 10px;"></div>
+                <span>不足　</span>
+              </div>
+      
+              <div class="col-4 d-flex justify-content-start align-items-center mb-3" style="white-space: nowrap; overflow: hidden;">
+                <div style="width: 20px; height: 20px; background-color: rgba(0, 128, 0, 0.7); border-radius: 50%; margin-right: 10px;"></div>
+                <span>勤務可</span>
+              </div>
+      
+              <div class="col-4 d-flex justify-content-start align-items-center mb-3" style="white-space: nowrap; overflow: hidden;">
+                <div style="width: 20px; height: 20px; background-color: rgba(128, 128, 128, 0.7); border-radius: 50%; margin-right: 10px;"></div>
+                <span>確定済</span>
+              </div>
+            </div>
+          </div>   
+        </div>
+      </div>
     </div>
 
     <div id='calendar' class='m-5'></div>
   
+    {% include "app/_footer.html" %}
   </body>
 </html>
 
