@@ -49,7 +49,8 @@ class Signup(generic.CreateView):
     # データ送信
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["process_name"] = "Sign up"
+        context["process_name"] = "サインアップ"
+        context["button_text"] = "サインアップ"
         return context
 
 
@@ -70,7 +71,8 @@ class Edit(OnlyYouMixin, generic.UpdateView):
     # contextデータ作成
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["process_name"] = "Update"
+        context["process_name"] = "名前変更フォーム"
+        context["button_text"] = "変更"
         return context
 
 '''パスワード変更'''
@@ -82,7 +84,8 @@ class PasswordChange(PasswordChangeView):
     # contextデータ作成
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["process_name"] = "Change Password"
+        context["process_name"] = "パスワード変更フォーム"
+        context["button_text"] = "変更"
         return context
 
 

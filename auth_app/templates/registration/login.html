@@ -3,27 +3,33 @@
 <!-- コンテンツ -->
 {% block content %}
 <div class="container">
-  <div class="col-md-6 offset-md-3">
-    <div class="card mt-3 mb-3 bg-light">
-      <!-- カードヘッダー -->
-      <div class="card-header bg-primary text-light">
-        <h4>Log in</h4>
-      </div>
-      <!-- カードボディー -->
-      <div class="card-body">
-        <form action="" method="POST">
-          {{ form.non_field_errors }}
-          {% for field in form %}
-            <div class="form-group">
-              <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
-              {{ field }}
-              {{ field.errors }}
-            </div>
-          {% endfor %}
-          <button type="submit" class="btn btn-primary btn-lg btn-block mt-2" >Log in</button>
-          <input type="hidden" name="next" value="{{ next }}" />
-          {% csrf_token %}
-        </form>
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card mt-3 mb-3 shadow">
+        <!-- カードヘッダー -->
+        <div class="card-header" style="background-color: #addeaa; color: #333;">
+          <h4>ログイン</h4>
+        </div>
+        <!-- カードボディー -->
+        <div class="card-body">
+          <form action="" method="POST">
+            {{ form.non_field_errors }}
+            {% for field in form %}
+              <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                <input type="{{ field.field.widget.input_type }}" class="form-control" id="{{ field.id_for_label }}" name="{{ field.name }}">
+                {% if field.errors %}
+                  <div class="invalid-feedback">
+                    {{ field.errors|join:", " }}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+              <button type="submit" class="btn btn-lg btn-block mt-2" style="background-color: #addeaa; color: #333;">ログイン</button>
+              <input type="hidden" name="next" value="{{ next }}" />
+            {% csrf_token %}
+          </form>
+        </div>
       </div>
     </div>
   </div>

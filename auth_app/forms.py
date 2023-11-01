@@ -11,6 +11,7 @@ class LoginForm(AuthenticationForm):
     # bootstrap4対応
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['username'].label = "ユーザーネーム"
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
             field.widget.attrs['placeholder'] = field.label  # placeholderにフィールドのラベルを入れる
@@ -19,6 +20,7 @@ class LoginForm(AuthenticationForm):
 
 '''サインアップ用フォーム'''
 class SignupForm(UserCreationForm):
+    username = forms.CharField(label="ユーザー名")
 
     class Meta:
         model = get_user_model()
@@ -44,7 +46,8 @@ class SignupForm(UserCreationForm):
 
 '''ユーザー情報更新用フォーム'''
 class UserUpdateForm(forms.ModelForm):
-
+    username = forms.CharField(label="ユーザー名")
+    
     class Meta:
         model = get_user_model()
         fields = ('username',)
