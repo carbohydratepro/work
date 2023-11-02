@@ -124,7 +124,7 @@ def check_shift_exists(request, date):
 def detail(request, date):
     user = request.user
     # 指定された日付のシフトのみをフィルタリング
-    shifts = Shift.objects.filter(Q(date=date) & (Q(is_myself=False) | Q(user=request.user)))
+    shifts = Shift.objects.select_related('user').filter(Q(date=date) & (Q(is_myself=False) | Q(user=request.user)))
 
     data = [{
         'id':shift.id,
