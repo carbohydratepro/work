@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='shift',
             name='memo',
-            field=models.TextField(null=True, default=None),
+            field=models.TextField(null=True, default=None, blank=True),
         ),
     ]

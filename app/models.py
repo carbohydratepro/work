@@ -14,7 +14,7 @@ class Shift(models.Model):
     is_staff = models.BooleanField(default=False, verbose_name="スタッフアカウント")
     is_myself = models.BooleanField(default=False)
     position = models.CharField(max_length=10, default="all") #kitchen floor all
-    memo = models.TextField(null=True, default=None)
+    memo = models.TextField(null=True, default=None, blank=True)
 
     def __str__(self):
         return self.applicant_name

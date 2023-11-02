@@ -36,7 +36,12 @@
                 {{ form.memo }}
             </div>
 
-            <button type="submit" class="btn mt-3 btn-outline-primary btn-block">新規登録</button>
+            {% if user.is_staff %}
+                <button type="submit" class="btn mt-3 btn-outline-primary btn-block">新規登録</button>
+            {% else %}
+            <button type="submit" name="action" value="register_availability" class="btn mt-3 btn-outline-primary btn-block">勤務可能日時として登録</button>
+            <button type="submit" name="action" value="register_attendance" class="btn mt-3 btn-outline-secondary btn-block">出勤日確認用として登録</button>
+            {% endif %}
         </form>
       </div>
     </div>

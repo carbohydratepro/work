@@ -21,6 +21,7 @@ class ShiftForm(forms.ModelForm):
     end_hour = forms.ChoiceField(choices=HOUR_CHOICES, label='終了時')
     end_minute = forms.ChoiceField(choices=MINUTE_CHOICES, label='終了分')
     memo = forms.CharField(
+        required=False,
         widget=forms.Textarea(attrs={'rows': 5,'placeholder': 'メモを入力...'}),
         )
     

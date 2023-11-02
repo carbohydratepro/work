@@ -69,7 +69,7 @@ def get_events(request):
     end_date = end_date.strftime('%Y-%m-%d')
     
     # この範囲内のイベントをクエリします。
-    events = Shift.objects.filter(date__range=[start_date, end_date])
+    events = Shift.objects.filter(Q(date__range=[start_date, end_date]) & (Q(is_myself=False) | Q(user=request.user)))
 
     # イベントをFullCalendarが受け入れる形式に変換
     data = [{
@@ -116,7 +116,7 @@ def get_events(request):
 
 @login_required
 def check_shift_exists(request, date):
-    exists = Shift.objects.filter(date=date).exists()
+    exists = Shift.objects.filter(Q(date=date) & (Q(is_myself=False) | Q(user=request.user))).exists()
     print(exists)
     return JsonResponse({'exists': exists})
 
@@ -124,7 +124,7 @@ def check_shift_exists(request, date):
 def detail(request, date):
     user = request.user
     # 指定された日付のシフトのみをフィルタリング
-    shifts = Shift.objects.filter(date=date)
+    shifts = Shift.objects.filter(Q(date=date) & (Q(is_myself=False) | Q(user=request.user)))
 
     data = [{
         'id':shift.id,
@@ -148,6 +148,7 @@ def detail(request, date):
     )
     
     context = {
+        'shifts': shifts,
         'data': json.dumps(data),
         'date': date,
         'is_staff': user.is_staff,
@@ -170,6 +171,13 @@ def new(request):
                 shift.is_staff = True
             else:
                 shift.is_staff = False
+                
+            if 'action' in request.POST:
+                if request.POST['action'] == 'register_availability':
+                    shift.is_myself = False
+                elif request.POST['action'] == 'register_attendance':
+                    shift.is_myself = True
+                    shift.is_confirmed = True
             shift.save()
             return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
         else:
