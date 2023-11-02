@@ -25,6 +25,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
     view_type = models.CharField(max_length=5, default='mix')
+    position = models.CharField(max_length=10, default="chick") #chick kitchen floor all
 
     objects = CustomUserManager()
 

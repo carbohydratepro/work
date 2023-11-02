@@ -12,6 +12,9 @@ class Shift(models.Model):
     is_substitute_found = models.BooleanField(default=False, verbose_name="代役が見つかっている")
     is_confirmed = models.BooleanField(default=False, verbose_name="確定済み")
     is_staff = models.BooleanField(default=False, verbose_name="スタッフアカウント")
+    is_myself = models.BooleanField(default=False)
+    position = models.CharField(max_length=10, default="all") #kitchen floor all
+    memo = models.TextField(null=True, default=None)
 
     def __str__(self):
         return self.applicant_name
