@@ -62,10 +62,11 @@ class ShiftForm(forms.ModelForm):
 class ViewTypeForm(forms.Form):
     view_type = forms.ChoiceField(
         choices=[
+            ('mix', 'すべて表示'),
             ('red', '不足のみを表示'),
             ('green', '勤務可能のみを表示'),
             ('grey', '確定済みのみを表示'),
-            ('mix', 'すべて表示')
+            ('me', '自分のシフトのみを表示'),
         ],
         widget=forms.Select(attrs={'id': 'category_select'}),
         required=True,
