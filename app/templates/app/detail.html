@@ -42,6 +42,7 @@
         const dataInput = {{ data|safe }};
         const currentUserId = {{ request.user.id }};  // 現在のユーザーIDを取得
         const is_staff = {{ is_staff|yesno:"true,false" }};
+        const today = {{ date }}
 
         // 開始時間順にデータを逆ソート
         dataInput.sort((a, b) => (a.date + " " + a.Start) < (b.date + " " + b.Start) ? 1 : -1);
@@ -66,7 +67,7 @@
         });
         
         const layout = {
-            title: 'Gantt Chart',
+            title: "シフト",
             showlegend: false,
             xaxis: {
                 type: 'date',
