@@ -69,11 +69,13 @@ def get_events(request):
     end_date = end_date.strftime('%Y-%m-%d')
     
     # この範囲内のイベントをクエリします。
-    events = Shift.objects.filter(date__range=[start_date, end_date])
+    events = Shift.objects.select_related('user', 'substitute_user').filter(Q(date__range=[start_date, end_date]) & (Q(is_myself=False) | Q(user=request.user)))
 
     # イベントをFullCalendarが受け入れる形式に変換
     data = [{
         'title': '',
+        'user_id': event.user.id,
+        'substitute_user_id': event.substitute_user.id if event.substitute_user else None,
         'start': event.date.strftime('%Y-%m-%d'),
         'overlap': False,
         'display': "background",
@@ -93,17 +95,22 @@ def get_events(request):
     filtered_data = []
     for start in duplicated_starts:
         relevant_items = [item for item in data if item['start'] == start]
-        color = request.user.view_type
-        if color == 'mix':
-            # 'mix' の場合は、色の優先順位は 灰色 < 緑色 < 赤色 とする
-            color_priority = {'grey': 0, 'green': 100, 'red': 200}
-            # 最も優先度の高い色を選択する
-            max_priority = max(color_priority[item['color']] for item in relevant_items)
-            # 最も優先度の高い色のアイテムのみをフィルタリングする
-            filtered_items = [item for item in relevant_items if color_priority[item['color']] == max_priority]
+        if request.user.view_type == 'me':
+            filtered_items = [
+                item for item in relevant_items if (item['user_id'] == request.user.id or item['substitute_user_id'] == request.user.id)
+                ]
         else:
-            # 'red', 'green', 'grey' のいずれかの場合は、指定された色のアイテムのみをフィルタリングする
-            filtered_items = [item for item in relevant_items if item['color'] == color]
+            color = request.user.view_type
+            if color == 'mix':
+                # 'mix' の場合は、色の優先順位は 灰色 < 緑色 < 赤色 とする
+                color_priority = {'grey': 0, 'green': 100, 'red': 200}
+                # 最も優先度の高い色を選択する
+                max_priority = max(color_priority[item['color']] for item in relevant_items)
+                # 最も優先度の高い色のアイテムのみをフィルタリングする
+                filtered_items = [item for item in relevant_items if color_priority[item['color']] == max_priority]
+            else:
+                # 'red', 'green', 'grey' のいずれかの場合は、指定された色のアイテムのみをフィルタリングする
+                filtered_items = [item for item in relevant_items if item['color'] == color]
 
         filtered_data.extend(filtered_items)
 
@@ -116,7 +123,7 @@ def get_events(request):
 
 @login_required
 def check_shift_exists(request, date):
-    exists = Shift.objects.filter(date=date).exists()
+    exists = Shift.objects.filter(Q(date=date) & (Q(is_myself=False) | Q(user=request.user))).exists()
     print(exists)
     return JsonResponse({'exists': exists})
 
@@ -124,7 +131,7 @@ def check_shift_exists(request, date):
 def detail(request, date):
     user = request.user
     # 指定された日付のシフトのみをフィルタリング
-    shifts = Shift.objects.filter(date=date)
+    shifts = Shift.objects.select_related('user').filter(Q(date=date) & (Q(is_myself=False) | Q(user=request.user)))
 
     data = [{
         'id':shift.id,
@@ -148,6 +155,7 @@ def detail(request, date):
     )
     
     context = {
+        'shifts': shifts,
         'data': json.dumps(data),
         'date': date,
         'is_staff': user.is_staff,
@@ -170,6 +178,13 @@ def new(request):
                 shift.is_staff = True
             else:
                 shift.is_staff = False
+                
+            if 'action' in request.POST:
+                if request.POST['action'] == 'register_availability':
+                    shift.is_myself = False
+                elif request.POST['action'] == 'register_attendance':
+                    shift.is_myself = True
+                    shift.is_confirmed = True
             shift.save()
             return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
         else:

@@ -7,10 +7,42 @@
     <h1>{{ date }}</h1>
     <div id="plotly-div"></div>
 
+    <div class="container mt-4">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>名前</th>
+                    <th>開始時間</th>
+                    <th>終了時間</th>
+                    <th>ステータス</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for shift in shifts %}
+                <tr style="background-color: 
+                    {% if shift.is_confirmed %}#e8e8e8
+                    {% elif shift.is_staff %}#ffe0e0
+                    {% else %}#e8f8e0{% endif %};">
+                    <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}{{ shift.user.username }}{% endif %}</td>
+                    <td>{{ shift.start_time }}</td>
+                    <td>{{ shift.end_time }}</td>
+                    <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
     <script>
+        function getDtickValue() {
+            // If the window width is less than 768px (typical breakpoint for smartphones), set dtick for 3 hours, else 1 hour.
+            return window.innerWidth < 768 ? 10800000 : 3600000;
+        }
         const dataInput = {{ data|safe }};
         const currentUserId = {{ request.user.id }};  // 現在のユーザーIDを取得
         const is_staff = {{ is_staff|yesno:"true,false" }};
+        const today = {{ date }}
 
         // 開始時間順にデータを逆ソート
         dataInput.sort((a, b) => (a.date + " " + a.Start) < (b.date + " " + b.Start) ? 1 : -1);
@@ -35,12 +67,12 @@
         });
         
         const layout = {
-            title: 'Gantt Chart',
+            title: "シフト",
             showlegend: false,
             xaxis: {
                 type: 'date',
                 range: [dataInput[0].date + " 5:30", dataInput[0].date + " 22:30"],
-                dtick: 3600000,
+                dtick: getDtickValue(),
                 tickformat: '%H:%M',  // この行でx軸の日付を削除
                 tickangle:30,
                 showgrid: true,
@@ -71,7 +103,7 @@
             const idx = data.points[0].curveNumber;
             const shift = dataInput[idx];  // Shiftデータを取得
 
-            if (shift.user_id === currentUserId) {  // ShiftのユーザーIDと現在のユーザーIDが一致するか確認
+            if (shift.user_id === currentUserId && shift.is_confirmed === false) {  // ShiftのユーザーIDと現在のユーザーIDが一致するか確認
                 const edit_url = `/calendar/edit/${shift.id}/`;
                 window.location.href = edit_url;
             } else if (is_staff === true && shift.is_staff === false && shift.is_confirmed === false) {
