@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+# import environ
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -161,3 +163,9 @@ LOGIN_URL = '/login/'
 AUTH_USER_MODEL = 'auth_app.CustomUser'
 
 LOGOUT_REDIRECT_URL = '/top/'
+
+# 環境変数読み込み
+# env = environ.Env()
+# env.read_env(os.path.join(BASE_DIR, '.env'))
+# SECRET_KEY = env('SECRET_KEY')
+# DEBUG = env('DEBUG')
