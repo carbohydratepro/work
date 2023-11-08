@@ -21,6 +21,7 @@ class LoginForm(AuthenticationForm):
 '''サインアップ用フォーム'''
 class SignupForm(UserCreationForm):
     username = forms.CharField(label="ユーザー名")
+    store_code = forms.CharField(label="店舗コード")
 
     class Meta:
         model = get_user_model()

@@ -40,11 +40,12 @@ class Signup(generic.CreateView):
     form_class = SignupForm
 
     def form_valid(self, form):
-        user = form.save(commit=False)
-        user.is_staff = False
-        user.is_superuser = False
-        user.save()
-        return redirect('signup_done')
+        if user.store_code == "8224":
+            user = form.save(commit=False)
+            user.is_staff = False
+            user.is_superuser = False
+            user.save()
+            return redirect('signup_done')
 
     # データ送信
     def get_context_data(self, **kwargs):

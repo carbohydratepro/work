@@ -73,6 +73,16 @@ urlpatterns = [
 エラーが生じなければ成功
 ```
 
+seacret_key再生成
+```text
+docker-compose exec web python manage.py shell
+
+from django.core.management.utils import get_random_secret_key
+secret_key = get_random_secret_key()
+text = 'SECRET_KEY = \'{0}\''.format(secret_key)
+print(text)
+```
+
 ### 使用技術
    | 要素 | 名称 | バージョン |
    |---|---|---|
@@ -105,4 +115,10 @@ https://qiita.com/grv2688/items/a22df0c72e8a1ed10cb4
 ```text
 https://zenn.dev/leon0305/articles/8518e520e3b5ca
 https://zenn.dev/tmasuyama1114/articles/ec2-linux-git-install
+```
+
+###### デプロイ（セキュリティー強化）
+```text
+https://qiita.com/sindicum/items/620ba2984b6729e3a576
+https://qiita.com/Bashi50/items/d5bc47eeb9668304aaa2
 ```
