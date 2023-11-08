@@ -21,11 +21,11 @@ class LoginForm(AuthenticationForm):
 '''サインアップ用フォーム'''
 class SignupForm(UserCreationForm):
     username = forms.CharField(label="ユーザー名")
-    store_code = forms.CharField(label="店舗コード")
+    # store_code = forms.CharField(label="店舗コード")
 
     class Meta:
         model = get_user_model()
-        fields = ('username',)
+        fields = ('username', )
 
     def __init__(self, *args, **kwargs):
 
