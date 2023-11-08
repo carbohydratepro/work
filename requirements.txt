@@ -1,3 +1,6 @@
 Django==3.2
 psycopg2==2.8
 plotly
+django-environ
+gunicorn
+psycopg2

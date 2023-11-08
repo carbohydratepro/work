@@ -3,9 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var calendarEl = document.getElementById('calendar');
 
-    var calendar = new FullCalendar.Calendar(calendarEl, {
+    var calendarOptions = {
         initialView: 'dayGridMonth',
-        height: "auto",
 
         // contentHeight: AuthenticatorAssertionResponse,
         events: function(fetchInfo, successCallback, failureCallback) {
@@ -47,7 +46,13 @@ document.addEventListener('DOMContentLoaded', function() {
         //     // 日付セルの高さを新しい高さに設定
         //     $('.fc-day').height(26.5);
         //   }
-        });
+    }
+    // ウィンドウの幅に基づいて height オプションを設定
+    if (window.innerWidth < 768) {
+        calendarOptions.height = "auto";
+    };
+
+    var calendar = new FullCalendar.Calendar(calendarEl, calendarOptions);
       
     calendar.render();
 
