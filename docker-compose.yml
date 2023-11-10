@@ -1,24 +1,29 @@
 version: '3'
 
-services:
-  db:
-    image: postgres:13
-    environment:
-      - POSTGRES_DB=mydatabase
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
-  web:
+services:
+  gunicorn:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    image: gunicorn:20.1.0
+    container_name: gunicorn
     volumes:
-      - .:/code
+      - .:/code/
+      - gunicorn:/var/run/gunicorn
+    env_file: .env
+    stdin_open: true
+    tty: true
+
+  nginx:
+    image: nginx:1.17.7
+    container_name: nginx
+    depends_on:
+      - gunicorn
     ports:
       - "8000:8000"
-    depends_on:
-      - db
-
+    volumes:
+      - ./gunicorn.conf:/etc/nginx/conf.d/default.conf
+      - ./static_root:/var/www/mysite/static
+      - gunicorn:/var/run/gunicorn
 volumes:
-  postgres_data:
+  gunicorn:
+    driver: local

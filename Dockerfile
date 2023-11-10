@@ -16,5 +16,9 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # メモリを解放するためにキャッシュを削除
 RUN rm -rf /root/.cache/pip/
 
+# gunicorn環境セッティング
+RUN mkdir -p /var/run/gunicorn
+CMD ["gunicorn", "project.wsgi:application", "--bind=unix:/var/run/gunicorn/gunicorn.sock"]
+
 # プロジェクトのファイルをコンテナにコピー
-COPY . /work/
+COPY . /code/
