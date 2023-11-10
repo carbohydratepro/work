@@ -99,7 +99,7 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-DB_NAME = env('SECRET_KEY')
+DB_NAME = env('DB_NAME')
 DB_USER = env('DB_USER')
 DB_PASS = env('DB_PASS')
 DB_HOST = env('DB_HOST')
