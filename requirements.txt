@@ -2,5 +2,5 @@ Django==3.2
 psycopg2==2.8
 plotly
 django-environ
-gunicorn
+gunicorn==20.1.0
 psycopg2
