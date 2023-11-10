@@ -9,7 +9,7 @@ services:
     volumes:
       - .:/code/
       - gunicorn:/var/run/gunicorn
-    env_file: .env
+    env_file: secret.env
     stdin_open: true
     tty: true
 
