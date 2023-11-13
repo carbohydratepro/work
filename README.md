@@ -117,6 +117,11 @@ https://zenn.dev/leon0305/articles/8518e520e3b5ca
 https://zenn.dev/tmasuyama1114/articles/ec2-linux-git-install
 ```
 
+###### static読み込めないエラーの解消
+```text
+https://zenn.dev/leon0305/articles/8518e520e3b5ca
+```
+
 ###### デプロイ（セキュリティー強化）
 ```text
 https://qiita.com/sindicum/items/620ba2984b6729e3a576
