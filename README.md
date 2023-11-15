@@ -85,7 +85,13 @@ print(text)
 
 ### 1000. デプロイ
 ```text
-staticファイル関係のパスを設定後、以下のコマンドでstaticファイルを一つにまとめる。
+staticファイルをappと同階層に配置。
+以下のファイルにて、staticファイル関係のパスを設定。
+- project/settings.py
+- docker-compose.yml
+- gunicorn.conf
+
+以下のコマンドでstaticファイルを一つにまとめる。
 docker-compose exec gunicorn python manage.py collectstatic
 ```
 

@@ -1,3 +1,4 @@
 *.pyc
-django-app-key-work.pem
 *.env
+*.log
+django-app-key-work.pem
