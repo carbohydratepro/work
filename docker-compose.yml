@@ -1,0 +1,29 @@
+version: '3'
+
+
+services:
+  gunicorn:
+    build: .
+    image: gunicorn:20.1.0
+    container_name: gunicorn
+    volumes:
+      - .:/code/
+      - gunicorn:/var/run/gunicorn
+    env_file: secret.env
+    stdin_open: true
+    tty: true
+
+  nginx:
+    image: nginx:1.17.7
+    container_name: nginx
+    depends_on:
+      - gunicorn
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./gunicorn.conf:/etc/nginx/conf.d/default.conf
+      - ./static_root:/var/www/mysite/static
+      - gunicorn:/var/run/gunicorn
+volumes:
+  gunicorn:
+    driver: local
