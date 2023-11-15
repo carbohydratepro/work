@@ -83,6 +83,12 @@ text = 'SECRET_KEY = \'{0}\''.format(secret_key)
 print(text)
 ```
 
+### 1000. デプロイ
+```text
+staticファイル関係のパスを設定後、以下のコマンドでstaticファイルを一つにまとめる。
+docker-compose exec gunicorn python manage.py collectstatic
+```
+
 ### 使用技術
    | 要素 | 名称 | バージョン |
    |---|---|---|
