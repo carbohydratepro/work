@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib import messages
+from django.urls import reverse
 
 import json
 # import logging
@@ -200,6 +201,14 @@ def new(request):
 def edit(request, shift_id):
     user = request.user
     shift = get_object_or_404(Shift, pk=shift_id)
+    if shift.user.id != user.id:
+        # 元のURLをリファラヘッダから取得
+        referer_url = request.META.get('HTTP_REFERER')
+        # リファラが取得できない場合は別のデフォルトURLにリダイレクト
+        if not referer_url:
+            referer_url = reverse('display-calendar')
+        return redirect(referer_url)
+    
     form_error = None
     initial = {
         "date": shift.date,
@@ -207,6 +216,7 @@ def edit(request, shift_id):
         "start_minute": shift.start_time.minute,
         "end_hour": shift.end_time.hour,
         "end_minute": shift.end_time.minute,
+        "memo": shift.memo,
     }
 
     if request.method == "POST":

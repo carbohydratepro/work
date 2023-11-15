@@ -19,7 +19,7 @@
             </thead>
             <tbody>
                 {% for shift in shifts %}
-                <tr style="background-color: 
+                <tr class="clickable-row" data-href="/calendar/edit/{{shift.id}}/" style="background-color: 
                     {% if shift.is_confirmed %}#e8e8e8
                     {% elif shift.is_staff %}#ffe0e0
                     {% else %}#e8f8e0{% endif %};">
@@ -33,6 +33,16 @@
         </table>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const rows = document.querySelectorAll('.clickable-row');
+            rows.forEach(row => {
+                row.addEventListener('click', function () {
+                    window.location.href = this.dataset.href;
+                });
+            });
+        });
+    </script>
 
     <script>
         function getDtickValue() {

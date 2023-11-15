@@ -28,7 +28,7 @@ class ShiftForm(forms.ModelForm):
     
     class Meta:
         model = Shift
-        fields = ['date', 'start_hour', 'start_minute', 'end_hour', 'end_minute']
+        fields = ['date', 'start_hour', 'start_minute', 'end_hour', 'end_minute', 'memo']
 
 
     def clean(self):
