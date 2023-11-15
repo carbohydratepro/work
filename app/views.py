@@ -12,6 +12,7 @@ from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.contrib import messages
 
 import json
 # import logging
@@ -206,32 +207,43 @@ def edit(request, shift_id):
         "start_minute": shift.start_time.minute,
         "end_hour": shift.end_time.hour,
         "end_minute": shift.end_time.minute,
-        }
+    }
+
     if request.method == "POST":
-        form = ShiftForm(request.POST or None, instance=shift, initial=initial)
-        if form.is_valid():
-            shift = form.save(commit=False)  # データベースにはまだ保存しない
-            shift.applicant_name = user.username
-            shift.start_time = f"{form.cleaned_data['start_hour']}:{form.cleaned_data['start_minute']}"
-            shift.end_time = f"{form.cleaned_data['end_hour']}:{form.cleaned_data['end_minute']}"
-            shift.save()
-            # print(connection.queries) # データベースの状態確認用
-            return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
+        if shift.is_confirmed and shift.is_myself == False:
+            form_error = "確定済みのシフトは変更できません"
+            form = ShiftForm(instance=shift, initial=initial)
         else:
-            form_error = form.errors.as_text()  # エラーをテキストとして取得
-            form_error = f"勤務時間が{LOWEST_HOUR}時間以上{HIGHEST_HOUR}時間以内になるように調整してください"
-            
+            form = ShiftForm(request.POST or None, instance=shift, initial=initial)
+            if form.is_valid():
+                shift = form.save(commit=False)  # データベースにはまだ保存しない
+                shift.applicant_name = user.username
+                shift.start_time = f"{form.cleaned_data['start_hour']}:{form.cleaned_data['start_minute']}"
+                shift.end_time = f"{form.cleaned_data['end_hour']}:{form.cleaned_data['end_minute']}"
+                shift.save()
+                # print(connection.queries) # データベースの状態確認用
+                return redirect('list')
+            else:
+                form_error = form.errors.as_text()  # エラーをテキストとして取得
+                form_error = f"勤務時間が{LOWEST_HOUR}時間以上{HIGHEST_HOUR}時間以内になるように調整してください"
     else:
         form = ShiftForm(instance=shift, initial=initial)
     
     return render(request, 'app/edit.html', {'form': form, 'form_error': form_error, 'shift': shift})
 
+
 @login_required
 def delete(request, shift_id):
     shift = get_object_or_404(Shift, pk=shift_id)
     if request.method == "POST":
-        shift.delete()
-        return redirect('display-calendar')
+        if shift.is_confirmed and shift.is_myself == False:
+            messages.error(request, "確定済みのシフトは削除できません")
+        else:
+            shift.delete()
+            messages.success(request, "シフトを削除しました")
+        return redirect('list')
+    return redirect('list')
+
 
 @login_required
 def confirm(request, shift_id):
@@ -248,7 +260,7 @@ def confirm(request, shift_id):
         shift.substitute_name = user.username
         shift.save()
     
-    return redirect('display-calendar')  # 仮にcalendarという名前のURLにリダイレクト
+    return redirect('display-calendar')
 
 
 @login_required
