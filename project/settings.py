@@ -24,6 +24,7 @@ env = environ.Env()
 env.read_env(os.path.join(BASE_DIR, 'secret.env'))
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.('DEBUG')
+DEBUG = env.boolean('DEBUG')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
