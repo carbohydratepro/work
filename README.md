@@ -83,6 +83,18 @@ text = 'SECRET_KEY = \'{0}\''.format(secret_key)
 print(text)
 ```
 
+### 1000. デプロイ
+```text
+staticファイルをappと同階層に配置。
+以下のファイルにて、staticファイル関係のパスを設定。
+- project/settings.py
+- docker-compose.yml
+- gunicorn.conf
+
+以下のコマンドでstaticファイルを一つにまとめる。
+docker-compose exec gunicorn python manage.py collectstatic
+```
+
 ### 使用技術
    | 要素 | 名称 | バージョン |
    |---|---|---|
@@ -115,6 +127,11 @@ https://qiita.com/grv2688/items/a22df0c72e8a1ed10cb4
 ```text
 https://zenn.dev/leon0305/articles/8518e520e3b5ca
 https://zenn.dev/tmasuyama1114/articles/ec2-linux-git-install
+```
+
+###### static読み込めないエラーの解消
+```text
+https://zenn.dev/leon0305/articles/8518e520e3b5ca
 ```
 
 ###### デプロイ（セキュリティー強化）
