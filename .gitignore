@@ -1,5 +1,6 @@
 *.pyc
 *.env
 *.log
+docker-compose.yml
 django-app-key-work.pem
 static_root
