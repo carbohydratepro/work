@@ -15,19 +15,20 @@
             <div class="form-item p-2 d-flex justify-content-center align-items-center">
                 日付　{{ form.date }}<br>
             </div>
-
             <div class="form-item p-2 d-flex justify-content-center align-items-center">
                 開始時刻　
                 {{ form.start_hour }}
                 ：
                 {{ form.start_minute }}<br>
             </div>
-
             <div class="form-item p-2 d-flex justify-content-center align-items-center">
                 終了時刻　
                 {{ form.end_hour }}
                 ：
                 {{ form.end_minute }}<br>
+            </div>
+            <div class="form-item p-2 d-flex justify-content-center align-items-center">
+                {{ form.memo }}
             </div>
 
             <button type="submit" class="btn mt-3 btn-outline-primary btn-block">編集を保存</button>

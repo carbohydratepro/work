@@ -13,6 +13,6 @@ urlpatterns = [
     path('update_user_view_type/', views.update_user_view_type, name='update_user_view_type'),
     path('confirm/<int:shift_id>/', views.confirm, name='confirm'),
     path('list/', views.list, name='list'),
-    path('carbohydrate/', admin.site.urls),
+    path('carbohydrate/app', admin.site.urls),
     # path('test', views.test, name='test'),
 ]
