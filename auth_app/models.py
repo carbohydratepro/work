@@ -20,13 +20,17 @@ class CustomUserManager(BaseUserManager):
         return user
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(unique=True, max_length=50)
+    username = models.CharField(unique=False, max_length=50)
+    email = models.EmailField(unique=True, null=True, default=None)
+    
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
     view_type = models.CharField(max_length=5, default='mix')
     position = models.CharField(max_length=10, default="chick") #chick kitchen floor all
 
+    store_code = models.CharField(max_length=10, null=True, default=None)
+    employee_id_number = models.CharField(unique=True, max_length=20, null=True, default=None)
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'username'
+    USERNAME_FIELD = 'employee_id_number'

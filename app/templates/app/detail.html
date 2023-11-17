@@ -21,7 +21,7 @@
                 {% for shift in shifts %}
                 <tr class="clickable-row"
                     data-shift-id="{{ shift.id }}"
-                    data-shift-user-id="{{ shift.user.id }}"
+                    data-shift-user-id="{{ shift.user_id }}"
                     data-shift-is-confirmed="{{ shift.is_confirmed|yesno:'true,false' }}"
                     data-shift-is-staff="{{ shift.is_staff|yesno:'true,false' }}"
 
@@ -143,7 +143,7 @@
                     const shiftIsConfirmed = this.getAttribute('data-shift-is-confirmed') === 'true';
                     const shiftIsStaff = this.getAttribute('data-shift-is-staff') === 'true';
 
-                    if (shiftUserId === currentUserId && !shiftIsConfirmed) {  // ShiftのユーザーIDと現在のユーザーIDが一致するか確認
+                    if (shiftUserId === currentUserId.toString() && !shiftIsConfirmed) {  // ShiftのユーザーIDと現在のユーザーIDが一致するか確認
                         const edit_url = `/calendar/edit/${shiftId}/`;
                         window.location.href = edit_url;
                     } else if (is_staff && !shiftIsStaff && !shiftIsConfirmed) {
