@@ -9,7 +9,7 @@
   <!-- アカウント情報 -->
   <div class="row">
     <div class="col"><h4>■　登録情報</h4></div>
-    <div class="col text-right"><a href="{% url 'edit' user.pk %}">更新</a></div>
+    <div class="col text-right"><a href="{% url 'edit' user.pk %}">変更</a></div>
   </div>
   <table class="table table-bordered">
     <tbody>
@@ -27,8 +27,35 @@
       </tr>
       <tr> 
     {% endcomment %}
+      <tr>
         <td>ユーザー名</td>
         <td>{{ user.username }}</td>
+      </tr>
+      <tr>
+        <td>メールアドレス</td>
+        <td>{{ user.email }}</td>
+      </tr>
+      <tr>
+        <td>社員コード</td>
+        <td>{{ user.employee_id_number }}</td>
+      </tr>
+      <tr>
+        <td>店舗コード</td>
+        <td>{{ user.store_code }}</td>
+      </tr>
+      <tr>
+        <td>ポジション</td>
+        {% if user.position == "chick" %}
+          <td>ひよっこ</td>
+        {% elif user.position == "floor" %}
+          <td>フロア</td>
+        {% elif user.position == "kitchen" %}
+          <td>キッチン</td>
+        {% elif user.position == "all" %}
+          <td>オール</td>
+        {% else %}
+          <td> - </td>
+        {% endif %}
       </tr>
     </tbody>
   </table>
@@ -36,7 +63,7 @@
   <!-- パスワード -->
   <div class="row mt-4">
     <div class="col"><h4>■　パスワード</h4></div>
-    <div class="col text-right"><a href="{% url 'password_change' %}">更新</a></div>
+    <div class="col text-right"><a href="{% url 'password_change' %}">変更</a></div>
   </div>
   <table class="table table-bordered">
     <tbody>

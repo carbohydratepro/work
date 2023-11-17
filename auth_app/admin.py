@@ -4,7 +4,7 @@ from .models import CustomUser
 
 @admin.register(CustomUser)
 class UserAdmin(DefaultUserAdmin):
-    list_display = ('username',)  # ここを変更
+    list_display = ('username', 'email', 'position', 'store_code', 'employee_id_number')  # ここを変更
     # ユーザー作成時のフィールドセットを調整
     add_fieldsets = (
         (None, {
@@ -14,6 +14,6 @@ class UserAdmin(DefaultUserAdmin):
     )
     # ユーザー編集時のフィールドセットを調整
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
+        (None, {'fields': ('username', 'password', 'employee_id_number')}),
         ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser')}),
     )

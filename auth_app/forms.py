@@ -7,6 +7,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, Pass
 
 '''ログイン用フォーム'''
 class LoginForm(AuthenticationForm):
+    employee_id_number = forms.CharField(label="社員コード")
 
     # bootstrap4対応
     def __init__(self, *args, **kwargs):
@@ -49,11 +50,26 @@ class SignupForm(UserCreationForm):
 
 '''ユーザー情報更新用フォーム'''
 class UserUpdateForm(forms.ModelForm):
+    position = forms.ChoiceField(
+        choices=[
+            ('chick', 'ひよっこ'),
+            ('kitchen', 'キッチン'),
+            ('floor', 'フロア'),
+            ('all', 'オール'),
+        ],
+        widget=forms.Select(attrs={'id': 'category_select'}),
+        required=True,
+        label="ポジション",
+        )
+
     username = forms.CharField(label="ユーザー名")
+    email = forms.EmailField(label="メールアドレス")
+    store_code = forms.CharField(label="店舗コード")
+    employee_id_number = forms.CharField(label="社員コード")
     
     class Meta:
         model = get_user_model()
-        fields = ('username',)
+        fields = ('username', 'email', 'store_code', 'employee_id_number', 'position')
 
     # bootstrap4対応
     def __init__(self, *args, **kwargs):
