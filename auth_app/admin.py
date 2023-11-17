@@ -14,6 +14,6 @@ class UserAdmin(DefaultUserAdmin):
     )
     # ユーザー編集時のフィールドセットを調整
     fieldsets = (
-        (None, {'fields': ('username', 'password', 'employee_id_number')}),
+        (None, {'fields': ('employee_id_number', 'password')}),
         ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser')}),
     )
