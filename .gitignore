@@ -1,6 +1,7 @@
 *.pyc
 *.env
 *.log
-django-app-key-work.pem
 static_root/
+project/maintenance_mode_state.txt
+django-app-key-work.pem
 docker-compose-dev.yml
