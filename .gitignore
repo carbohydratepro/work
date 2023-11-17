@@ -2,5 +2,5 @@
 *.env
 *.log
 django-app-key-work.pem
-static_root
+static_root/
 docker-compose-dev.yml
