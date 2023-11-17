@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'maintenance_mode',
     'app',
     'auth_app.apps.AuthAppConfig',
 ]
@@ -71,6 +72,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'maintenance_mode.middleware.MaintenanceModeMiddleware',
     # 'auth_app.middleware.LoginRequiredMiddleware',
 ]
 
@@ -86,7 +88,7 @@ ROOT_URLCONF = 'project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -178,4 +180,13 @@ AUTH_USER_MODEL = 'auth_app.CustomUser'
 
 LOGOUT_REDIRECT_URL = '/top/'
 
+# メンテナンス中でも管理サイトへアクセスできるようにする
+MAINTENANCE_MODE_IGNORE_ADMIN_SITE = True
 
+# メンテナンス中でもスーパーユーザーのみ通常サイトを見れるようにする
+MAINTENANCE_MODE_IGNORE_SUPERUSER = True
+
+MAINTENANCE_MODE_TEMPLATE = '503.html'
+
+# maintenance-mode on
+# maintenance-mode off
