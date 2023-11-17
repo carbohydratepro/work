@@ -71,7 +71,7 @@ class UserUpdateForm(forms.ModelForm):
 
     username = forms.CharField(label="ユーザー名")
     email = forms.EmailField(label="メールアドレス")
-    store_code = forms.CharField(label="店舗コード")
+    store_code = forms.CharField(label="店舗コード", validators=[validate_confirm])
     employee_id_number = forms.CharField(label="社員コード")
     
     class Meta:
