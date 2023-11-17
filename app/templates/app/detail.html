@@ -19,10 +19,16 @@
             </thead>
             <tbody>
                 {% for shift in shifts %}
-                <tr class="clickable-row" data-href="/calendar/edit/{{shift.id}}/" style="background-color: 
-                    {% if shift.is_confirmed %}#e8e8e8
-                    {% elif shift.is_staff %}#ffe0e0
-                    {% else %}#e8f8e0{% endif %};">
+                <tr class="clickable-row"
+                    data-shift-id="{{ shift.id }}"
+                    data-shift-user-id="{{ shift.user.id }}"
+                    data-shift-is-confirmed="{{ shift.is_confirmed|yesno:'true,false' }}"
+                    data-shift-is-staff="{{ shift.is_staff|yesno:'true,false' }}"
+
+                    style="background-color: 
+                        {% if shift.is_confirmed %}#e8e8e8
+                        {% elif shift.is_staff %}#ffe0e0
+                        {% else %}#e8f8e0{% endif %};">
                     <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}{{ shift.user.username }}{% endif %}</td>
                     <td>{{ shift.start_time }}</td>
                     <td>{{ shift.end_time }}</td>
@@ -33,16 +39,7 @@
         </table>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const rows = document.querySelectorAll('.clickable-row');
-            rows.forEach(row => {
-                row.addEventListener('click', function () {
-                    window.location.href = this.dataset.href;
-                });
-            });
-        });
-    </script>
+
 
     <script>
         function getDtickValue() {
@@ -135,6 +132,41 @@
                     window.location.href = confirm_url;  
                 }
             }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            const rows = document.querySelectorAll('.clickable-row');
+            rows.forEach(row => {
+                row.addEventListener('click', function () {
+                    const shiftId = this.getAttribute('data-shift-id')
+                    const shiftUserId = this.getAttribute('data-shift-user-id')
+                    const shiftIsConfirmed = this.getAttribute('data-shift-is-confirmed') === 'true';
+                    const shiftIsStaff = this.getAttribute('data-shift-is-staff') === 'true';
+
+                    if (shiftUserId === currentUserId && !shiftIsConfirmed) {  // ShiftのユーザーIDと現在のユーザーIDが一致するか確認
+                        const edit_url = `/calendar/edit/${shiftId}/`;
+                        window.location.href = edit_url;
+                    } else if (is_staff && !shiftIsStaff && !shiftIsConfirmed) {
+                        const isConfirmed = confirm("このシフトを確定しますか？\n※この操作は取り消しできません。");
+                        if (!isConfirmed) {
+                            // ユーザーが「キャンセル」を選択した場合、遷移をキャンセルする
+                            event.preventDefault();
+                        } else {
+                            const confirm_url = `/calendar/confirm/${shiftId}/`;
+                            window.location.href = confirm_url;  
+                        }
+                    } else if (!is_staff && shiftIsStaff && !shiftisConfirmed) {
+                        const isConfirmed = confirm("このシフトを確定しますか？\n※この操作は取り消しできません。");
+                        if (!isConfirmed) {
+                            // ユーザーが「キャンセル」を選択した場合、遷移をキャンセルする
+                            event.preventDefault();
+                        } else {
+                            const confirm_url = `/calendar/confirm/${shiftId}/`;
+                            window.location.href = confirm_url;  
+                        }
+                    }
+                })
+            });
         });
     </script>
 
