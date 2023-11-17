@@ -13,7 +13,7 @@ class Shift(models.Model):
     is_confirmed = models.BooleanField(default=False, verbose_name="確定済み")
     is_staff = models.BooleanField(default=False, verbose_name="スタッフアカウント")
     is_myself = models.BooleanField(default=False)
-    position = models.CharField(max_length=10, default="all") #kitchen floor all
+    position = models.CharField(max_length=10, default="all") # chick kitchen floor all
     memo = models.TextField(null=True, default=None, blank=True)
 
     def __str__(self):
