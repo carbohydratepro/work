@@ -17,4 +17,4 @@ class Shift(models.Model):
     memo = models.TextField(null=True, default=None, blank=True)
 
     def __str__(self):
-        return self.applicant_name
+        return self.applicant_name or "未指定"

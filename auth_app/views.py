@@ -46,9 +46,7 @@ class Signup(generic.CreateView):
         user.is_superuser = False
         user.save()
         return redirect('signup_done')
-        # else:
-        #     return redirect('Signup')
-
+    
     # データ送信
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

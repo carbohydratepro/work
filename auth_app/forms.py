@@ -1,10 +1,17 @@
 from django import forms
 from django.contrib.auth import get_user_model # ユーザーモデルを取得するため
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm
+from django.core.exceptions import ValidationError
 
 
-
-
+def validate_confirm(store_code):
+    store_codes = ["8224"]
+    if store_code not in  store_codes:
+        raise ValidationError(
+            "正しい店舗コードを入力してください",
+            params={'store_code': store_code},
+        )
+        
 '''ログイン用フォーム'''
 class LoginForm(AuthenticationForm):
     employee_id_number = forms.CharField(label="社員コード")
@@ -23,7 +30,7 @@ class LoginForm(AuthenticationForm):
 class SignupForm(UserCreationForm):
     username = forms.CharField(label="ユーザー名")
     email = forms.EmailField(label="メールアドレス")
-    store_code = forms.CharField(label="店舗コード")
+    store_code = forms.CharField(label="店舗コード", validators=[validate_confirm])
     employee_id_number = forms.CharField(label="社員コード")
 
     class Meta:
