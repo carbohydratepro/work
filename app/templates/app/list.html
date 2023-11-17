@@ -36,7 +36,7 @@
         </thead>
         <tbody>
             {% for shift in shifts %}
-            <tr style="background-color: 
+            <tr class="clickable-row" data-href="/calendar/edit/{{shift.id}}/" style="background-color: 
                 {% if shift.date >= today and shift.is_confirmed %}#ffe8e0
                 {% elif shift.date <= today %}#e8e8e8  {# より薄い灰色に変更 #}
                 {% else %}#ffffff{% endif %};">
@@ -67,5 +67,15 @@
             {% endif %}
         </span>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const rows = document.querySelectorAll('.clickable-row');
+            rows.forEach(row => {
+                row.addEventListener('click', function () {
+                    window.location.href = this.dataset.href;
+                });
+            });
+        });
+    </script>
 </div>
 {% endblock %}
