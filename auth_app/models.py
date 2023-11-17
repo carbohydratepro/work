@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 
 class CustomUserManager(BaseUserManager):
-    def create_superuser(self, username, password=None, **extra_fields):
+    def create_superuser(self, employee_id_number, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -11,10 +11,10 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self.create_user(username, password, **extra_fields)
+        return self.create_user(employee_id_number, password, **extra_fields)
 
-    def create_user(self, username, password=None, **extra_fields):
-        user = self.model(username=username, **extra_fields)
+    def create_user(self, employee_id_number, password=None, **extra_fields):
+        user = self.model(employee_id_number=employee_id_number, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -34,3 +34,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'employee_id_number'
+
+    def __str__(self):
+        return self.username or "未指定ユーザー"
