@@ -139,3 +139,8 @@ https://zenn.dev/leon0305/articles/8518e520e3b5ca
 https://qiita.com/sindicum/items/620ba2984b6729e3a576
 https://qiita.com/Bashi50/items/d5bc47eeb9668304aaa2
 ```
+
+###### 管理者サイト
+```text
+https://qiita.com/ryo-keima/items/2bb55c05a79929ec9e71
+```
