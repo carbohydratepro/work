@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
-from .models import CustomUser
+from .models import CustomUser, Store
 
 class CustomUserAdmin(DefaultUserAdmin):
     model = CustomUser
@@ -20,4 +20,11 @@ class CustomUserAdmin(DefaultUserAdmin):
     search_fields = ('employee_id_number', 'username', 'email')
     ordering = ('employee_id_number',)
 
+
+class StoreAdmin(admin.ModelAdmin):
+    list_display = ('store_code', 'store_name')
+    search_fields = ('store_code', 'store_name')
+    
+    
 admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(Store, StoreAdmin)

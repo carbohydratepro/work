@@ -2,11 +2,11 @@ from django import forms
 from django.contrib.auth import get_user_model # ユーザーモデルを取得するため
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm
 from django.core.exceptions import ValidationError
+from .models import Store
 
 
 def validate_confirm(store_code):
-    store_codes = ["8224"]
-    if store_code not in  store_codes:
+    if not Store.objects.filter(store_code=store_code).exists():
         raise ValidationError(
             "正しい店舗コードを入力してください",
             params={'store_code': store_code},
@@ -71,7 +71,7 @@ class UserUpdateForm(forms.ModelForm):
 
     username = forms.CharField(label="ユーザー名")
     email = forms.EmailField(label="メールアドレス")
-    store_code = forms.CharField(label="店舗コード")
+    store_code = forms.CharField(label="店舗コード", validators=[validate_confirm])
     employee_id_number = forms.CharField(label="社員コード")
     
     class Meta:

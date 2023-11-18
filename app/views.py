@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Shift
-from .forms import ShiftForm, ViewTypeForm, TestForm
+from .forms import ShiftForm, ViewTypeForm
 from django.http import JsonResponse
 from datetime import datetime
 from django.db import connection
@@ -14,6 +14,8 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib import messages
 from django.urls import reverse
+from auth_app.models import CustomUser
+
 
 import json
 # import logging
@@ -26,7 +28,7 @@ import json
 
 
 LOWEST_HOUR = 2
-HIGHEST_HOUR = 8
+HIGHEST_HOUR = 9
 
 
 @login_required
@@ -259,24 +261,49 @@ def delete(request, shift_id):
 def confirm(request, shift_id):
     user = request.user
     shift = get_object_or_404(Shift, pk=shift_id)
+    
+    # 元のURLをリファラヘッダから取得
+    referer_url = request.META.get('HTTP_REFERER')
+    # リファラが取得できない場合は別のデフォルトURLにリダイレクト
+    if not referer_url:
+        referer_url = reverse('display-calendar')
+        
+    # 現在の日時を取得
+    now = timezone.localtime(timezone.now())
+    print(now)
+
+    # shift.date と shift.start_time を組み合わせた日時オブジェクトを作成
+    shift_datetime = timezone.make_aware(datetime.combine(shift.date, shift.start_time))
+
+    # shift.date と shift.start_time が現在時刻より前かどうかを確認
+    if shift_datetime < now:
+        messages.error(request, '過去のシフトは確定できません。')
+        return redirect(referer_url)
+
     if user.is_staff:
         shift.is_confirmed = True
         shift.substitute_user = shift.user
         shift.substitute_name = shift.user.username
+        shift.confirmed_user = request.user
         shift.save()
+        messages.success(request, 'シフトは正常に確定されました！')
     else:
         shift.is_confirmed = True
         shift.substitute_user = user
         shift.substitute_name = user.username
+        shift.confirmed_user = request.user
         shift.save()
+        messages.success(request, 'シフトは正常に確定されました！')
     
-    return redirect('display-calendar')
+    
+    return redirect(referer_url)
 
 
 @login_required
 def list(request):
     # ログイン中のユーザーのシフトを日付の新しい順に取得
-    shifts = Shift.objects.filter(Q(user=request.user) | Q(substitute_user=request.user)).order_by('-date')
+    shifts = Shift.objects.filter(Q(user=request.user) | Q(substitute_user=request.user) | Q(confirmed_user=request.user)).order_by('-date')
+
     paginator = Paginator(shifts, 10)  # 10件ずつ表示するページネーター
 
     page = request.GET.get('page')  # 現在のページ番号を取得
@@ -287,64 +314,3 @@ def list(request):
     }
     return render(request, 'app/list.html', context)
 
-
-@login_required
-def test(request):
-    import torch
-    from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
-    from torch.optim import AdamW
-    
-    sentence=[
-        'アメリカには自由の女神がある。',
-        'アフリカの草原にはゾウがいる。',
-        '早起きして一日を有意義に過ごす。',
-        'パソコンが壊れたので買い替える。',
-        'リサイクルショップで中古の自転車を買う。',
-        '自由の女神がある国はアメリカである。',
-        '新品の電動自転車を購入する。'
-    ]
-    
-    model_name = "cl-tohoku/bert-large-japanese"
-    unmasker = pipeline('fill-mask', model=model_name)
-    results = None
-    
-    sentence_index = request.GET.get(key="sentence", default=0)
-    word_selected = request.GET.get(key="word", default="")
-    
-    form = TestForm()
-    if request.method == "POST":
-        if form.is_valid():
-        # 内容を取得する
-            sentence_index = int(form.cleaned_data.get("sentence"))
-            word_selected = form.cleaned_data.get("word")
-            
-
-    sentence_selected = sentence[int(sentence_index)]
-    form.fields['sentence'].initial = [sentence_selected]
-    
-    # 選択フォームの選択を取得した値で固定する
-    print(sentence_selected)
-    print(word_selected)
-
-    
-    if (sentence_selected is not None and 
-        word_selected is not None and
-        word_selected in sentence_selected):
-        
-        text = sentence_selected.replace(word_selected, "[MASK]")
-        results = unmasker(text)
-
-        for result in results:
-            if isinstance(result, dict) and "token_str" in result:
-                token_str = result["token_str"]
-                score = result["score"]
-                print(f"{token_str}:{score:.5f}")
-                
-    context = {
-        "form": form,
-        "sentence_selected": sentence_selected,
-        "word_selected": word_selected,
-        "results": results,
-    }
-
-    return render(request, 'app/test.html', context)
