@@ -73,21 +73,5 @@ class ViewTypeForm(forms.Form):
         label="表示方法"
         )
 
-class TestForm(forms.Form):
-    sentence = forms.ChoiceField(
-        choices=[
-            (0, 'アメリカには自由の女神がある。'),
-            (1, 'アフリカの草原にはゾウがいる。'),
-            (2, '早起きして一日を有意義に過ごす。'),
-            (3, 'パソコンが壊れたので買い替える。'),
-            (4, 'リサイクルショップで中古の自転車を買う。'),
-            (5, '自由の女神がある国はアメリカである。'),
-            (6, '新品の電動自転車を購入する。')
-        ],
-        widget=forms.Select(attrs={'id': 'category_select'}),
-        required=False
-        )
-    
-    word = forms.CharField()
     
     

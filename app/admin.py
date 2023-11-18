@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Shift
 
 class ShiftAdmin(admin.ModelAdmin):
-    list_display = ('user', 'applicant_name', 'substitute_user', 'date', 'start_time', 'end_time', 'is_substitute_found', 'is_confirmed', 'position')
+    list_display = ('user', 'applicant_name', 'substitute_user', 'confirmed_user', 'date', 'start_time', 'end_time', 'is_substitute_found', 'is_confirmed', 'position')
     list_filter = ('date', 'is_substitute_found', 'is_confirmed', 'position')
     search_fields = ('applicant_name', 'substitute_name', 'memo')
     ordering = ('date', 'start_time')
