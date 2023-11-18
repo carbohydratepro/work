@@ -37,3 +37,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username or "未指定ユーザー"
+
+class Store(models.Model):
+    store_name = models.CharField(max_length=100, unique=True)
+    store_code = models.CharField(max_length=10, unique=True)
+    
+    def __str__(self):
+        return self.store_code or "0000000000"
