@@ -259,6 +259,23 @@ def delete(request, shift_id):
 def confirm(request, shift_id):
     user = request.user
     shift = get_object_or_404(Shift, pk=shift_id)
+    # 現在の日時を取得
+    now = timezone.localtime(timezone.now())
+    print(now)
+
+    # shift.date と shift.start_time を組み合わせた日時オブジェクトを作成
+    shift_datetime = timezone.make_aware(datetime.combine(shift.date, shift.start_time))
+
+    # shift.date と shift.start_time が現在時刻より前かどうかを確認
+    if shift_datetime < now:
+        messages.error(request, '過去のシフトは確定できません。')
+        # 元のURLをリファラヘッダから取得
+        referer_url = request.META.get('HTTP_REFERER')
+        # リファラが取得できない場合は別のデフォルトURLにリダイレクト
+        if not referer_url:
+            referer_url = reverse('display-calendar')
+        return redirect(referer_url)
+
     if user.is_staff:
         shift.is_confirmed = True
         shift.substitute_user = shift.user
