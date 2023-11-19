@@ -113,9 +113,16 @@ def get_events(request):
                 filtered_items = [item for item in relevant_items if color_priority[item['color']] == max_priority]
                 filtered_items = filtered_items[:5]
             else:
-                # 'red', 'green', 'grey' のいずれかの場合は、指定された色のアイテムのみをフィルタリングする
-                filtered_items = [item for item in relevant_items if item['color'] == color]
-                filtered_items = filtered_items[:5]
+                # 'red', 'green', 'grey' のいずれかの場合
+                rgba_color_map = {
+                    'red': 'rgba(255, 0, 0, 0.5)',
+                    'green': 'rgba(0, 128, 0, 0.5)',
+                    'grey': 'rgba(128, 128, 128, 0.5)'
+                }
+                selected_rgba_color = rgba_color_map[color]
+                filtered_items = [item for item in relevant_items if item['color'] == selected_rgba_color]
+                filtered_items = filtered_items[:5]  # 最大3つのアイテムを選択
+
 
         filtered_data.extend(filtered_items)
 
