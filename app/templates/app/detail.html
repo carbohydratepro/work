@@ -7,7 +7,7 @@
     <h1>{{ date }}</h1>
     <div id="plotly-div"></div>
 
-    <div class="container m-4">
+    <div class="container pt-4 pb-4">
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -20,7 +20,7 @@
             </thead>
             <tbody>
                 {% for shift in shifts %}
-                <tr class="clickable-row"
+                <tr class="clickable-row text-nowarap"
                     data-shift-id="{{ shift.id }}"
                     data-shift-user-id="{{ shift.user_id }}"
                     data-shift-is-confirmed="{{ shift.is_confirmed|yesno:'true,false' }}"
