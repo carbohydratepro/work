@@ -217,6 +217,7 @@ def edit(request, shift_id):
         "start_minute": shift.start_time.minute,
         "end_hour": shift.end_time.hour,
         "end_minute": shift.end_time.minute,
+        "position":shift.position,
         "memo": shift.memo,
     }
 
