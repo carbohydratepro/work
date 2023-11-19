@@ -7,41 +7,118 @@
     <h1>{{ date }}</h1>
     <div id="plotly-div"></div>
 
-    <div class="container mt-4">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>名前</th>
-                    <th>開始時間</th>
-                    <th>終了時間</th>
-                    <th>代役名</th>
-                    <th>ステータス</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for shift in shifts %}
-                <tr class="clickable-row"
-                    data-shift-id="{{ shift.id }}"
-                    data-shift-user-id="{{ shift.user_id }}"
-                    data-shift-is-confirmed="{{ shift.is_confirmed|yesno:'true,false' }}"
-                    data-shift-is-staff="{{ shift.is_staff|yesno:'true,false' }}"
+    {% if floor_shifts %}
+        <div class="container pt-4 pb-4">
+            <h4 class="pl-4">◆ フロア</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>名前</th>
+                        <th>開始時間</th>
+                        <th>終了時間</th>
+                        <th>代役名</th>
+                        <th>ステータス</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for shift in floor_shifts %}
+                    <tr class="clickable-row text-break"
+                        data-shift-id="{{ shift.id }}"
+                        data-shift-user-id="{{ shift.user_id }}"
+                        data-shift-is-confirmed="{{ shift.is_confirmed|yesno:'true,false' }}"
+                        data-shift-is-staff="{{ shift.is_staff|yesno:'true,false' }}"
 
-                    style="background-color: 
-                        {% if shift.is_confirmed %}#e8e8e8
-                        {% elif shift.is_staff %}#ffe0e0
-                        {% else %}#e8f8e0{% endif %};">
-                    <td>{% if shift.substitute_name %}-{% else %}{{ shift.user.username }}{% endif %}</td>
-                    <td>{{ shift.start_time }}</td>
-                    <td>{{ shift.end_time }}</td>
-                    <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
-                    <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                        style="background-color: 
+                            {% if shift.is_confirmed %}#e8e8e8
+                            {% elif shift.is_staff %}#ffe0e0
+                            {% else %}#e8f8e0{% endif %};">
+                        <td>{% if shift.substitute_name %}-{% else %}{{ shift.user.username }}{% endif %}</td>
+                        <td>{{ shift.start_time }}</td>
+                        <td>{{ shift.end_time }}</td>
+                        <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
+                        <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 
+    
+    {% if kitchen_shifts %}
+        <div class="container pt-4 pb-4">
+            <h4 class="pl-4">◆ キッチン</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>名前</th>
+                        <th>開始時間</th>
+                        <th>終了時間</th>
+                        <th>代役名</th>
+                        <th>ステータス</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for shift in kitchen_shifts %}
+                    <tr class="clickable-row text-break"
+                        data-shift-id="{{ shift.id }}"
+                        data-shift-user-id="{{ shift.user_id }}"
+                        data-shift-is-confirmed="{{ shift.is_confirmed|yesno:'true,false' }}"
+                        data-shift-is-staff="{{ shift.is_staff|yesno:'true,false' }}"
 
+                        style="background-color: 
+                            {% if shift.is_confirmed %}#e8e8e8
+                            {% elif shift.is_staff %}#ffe0e0
+                            {% else %}#e8f8e0{% endif %};">
+                        <td>{% if shift.substitute_name %}-{% else %}{{ shift.user.username }}{% endif %}</td>
+                        <td>{{ shift.start_time }}</td>
+                        <td>{{ shift.end_time }}</td>
+                        <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
+                        <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    
+    {% if all_shifts %}
+        <div class="container pt-4 pb-4">
+            <h4 class="pl-4">◆ オール</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>名前</th>
+                        <th>開始時間</th>
+                        <th>終了時間</th>
+                        <th>代役名</th>
+                        <th>ステータス</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for shift in all_shifts %}
+                    <tr class="clickable-row text-break"
+                        data-shift-id="{{ shift.id }}"
+                        data-shift-user-id="{{ shift.user_id }}"
+                        data-shift-is-confirmed="{{ shift.is_confirmed|yesno:'true,false' }}"
+                        data-shift-is-staff="{{ shift.is_staff|yesno:'true,false' }}"
+
+                        style="background-color: 
+                            {% if shift.is_confirmed %}#e8e8e8
+                            {% elif shift.is_staff %}#ffe0e0
+                            {% else %}#e8f8e0{% endif %};">
+                        <td>{% if shift.substitute_name %}-{% else %}{{ shift.user.username }}{% endif %}</td>
+                        <td>{{ shift.start_time }}</td>
+                        <td>{{ shift.end_time }}</td>
+                        <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
+                        <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 
     <script>
         function getDtickValue() {
@@ -53,8 +130,23 @@
         const is_staff = {{ is_staff|yesno:"true,false" }};
         const today = {{ date }}
 
-        // 開始時間順にデータを逆ソート
-        dataInput.sort((a, b) => (a.date + " " + a.Start) < (b.date + " " + b.Start) ? 1 : -1);
+        // positionに基づいてソートするための重みを設定
+        function getPositionWeight(position) {
+            if (position === "all") return 1;
+            if (position === "kitchen") return 2;
+            if (position === "floor") return 3;
+            return 4; // 未知のpositionの場合
+        }
+
+        // positionに基づいて並べ替え、その後開始時間順に逆ソート
+        dataInput.sort((a, b) => {
+            const positionWeightA = getPositionWeight(a.position);
+            const positionWeightB = getPositionWeight(b.position);
+            if (positionWeightA !== positionWeightB) {
+                return positionWeightA - positionWeightB;
+            }
+            return (a.date + " " + a.Start) < (b.date + " " + b.Start) ? 1 : -1;
+        });
 
         const traces = dataInput.map((d, i) => {
             const color = !d.is_confirmed && !d.is_staff ? 'green' : 
@@ -136,6 +228,8 @@
             }
         });
         
+
+
         document.addEventListener('DOMContentLoaded', function () {
             const rows = document.querySelectorAll('.clickable-row');
             rows.forEach(row => {

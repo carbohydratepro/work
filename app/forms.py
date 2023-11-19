@@ -20,6 +20,18 @@ class ShiftForm(forms.ModelForm):
     start_minute = forms.ChoiceField(choices=MINUTE_CHOICES, label='開始分')
     end_hour = forms.ChoiceField(choices=HOUR_CHOICES, label='終了時')
     end_minute = forms.ChoiceField(choices=MINUTE_CHOICES, label='終了分')
+    
+    position = forms.ChoiceField(
+        choices=[
+            ('kitchen', 'キッチン'),
+            ('floor', 'フロア'),
+            ('all', 'オール'),
+        ],
+        widget=forms.Select(attrs={'id': 'category_select'}),
+        required=True,
+        label="ポジション"
+        )
+    
     memo = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={'rows': 5,'placeholder': 'メモを入力...'}),
@@ -28,13 +40,13 @@ class ShiftForm(forms.ModelForm):
     
     class Meta:
         model = Shift
-        fields = ['date', 'start_hour', 'start_minute', 'end_hour', 'end_minute', 'memo']
+        fields = ['date', 'start_hour', 'start_minute', 'end_hour', 'end_minute', 'position', 'memo']
 
 
     def clean(self):
         
-        LOWEST_HOUR = 2
-        HIGHEST_HOUR = 8
+        LOWEST_HOUR = 1
+        HIGHEST_HOUR = 9
         
         cleaned_data = super().clean()
         

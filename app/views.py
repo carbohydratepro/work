@@ -26,7 +26,7 @@ import json
 #     # ...
 
 
-LOWEST_HOUR = 2
+LOWEST_HOUR = 1
 HIGHEST_HOUR = 9
 
 
@@ -82,7 +82,7 @@ def get_events(request):
         'start': event.date.strftime('%Y-%m-%d'),
         'overlap': False,
         'display': "background",
-        'color': 'grey' if event.is_confirmed else ('red' if event.is_staff else 'green')
+        'color': 'rgba(128, 128, 128, 0.5)' if event.is_confirmed else ('rgba(255, 0, 0, 0.5)' if event.is_staff else 'rgba(0, 128, 0, 0.5)')
     } for event in events]
 
     # 重複するstart日付を特定
@@ -106,14 +106,16 @@ def get_events(request):
             color = request.user.view_type
             if color == 'mix':
                 # 'mix' の場合は、色の優先順位は 灰色 < 緑色 < 赤色 とする
-                color_priority = {'grey': 0, 'green': 100, 'red': 200}
+                color_priority = {'rgba(128, 128, 128, 0.5)': 0, 'rgba(0, 128, 0, 0.5)': 100, 'rgba(255, 0, 0, 0.5)': 200}
                 # 最も優先度の高い色を選択する
                 max_priority = max(color_priority[item['color']] for item in relevant_items)
                 # 最も優先度の高い色のアイテムのみをフィルタリングする
                 filtered_items = [item for item in relevant_items if color_priority[item['color']] == max_priority]
+                filtered_items = filtered_items[:5]
             else:
                 # 'red', 'green', 'grey' のいずれかの場合は、指定された色のアイテムのみをフィルタリングする
                 filtered_items = [item for item in relevant_items if item['color'] == color]
+                filtered_items = filtered_items[:5]
 
         filtered_data.extend(filtered_items)
 
@@ -135,6 +137,9 @@ def detail(request, date):
     user = request.user
     # 指定された日付のシフトのみをフィルタリング
     shifts = Shift.objects.select_related('user').filter(Q(date=date) & (Q(is_myself=False) | Q(user=request.user)))
+    all_shifts = Shift.objects.select_related('user').filter(Q(date=date) & (Q(is_myself=False) | Q(user=request.user)) & Q(position="all"))
+    kitchen_shifts = Shift.objects.select_related('user').filter(Q(date=date) & (Q(is_myself=False) | Q(user=request.user)) & Q(position="kitchen"))
+    floor_shifts = Shift.objects.select_related('user').filter(Q(date=date) & (Q(is_myself=False) | Q(user=request.user)) & Q(position="floor"))
 
     data = [{
         'id':shift.id,
@@ -146,19 +151,34 @@ def detail(request, date):
         'substitute_name':shift.substitute_name,
         'is_staff': shift.is_staff,
         'is_confirmed':shift.is_confirmed,
+        'position':shift.position,
         'Resource': 'Shift'
     } for shift in shifts]
     
     # margin用のフェイクデータ追加
+    if any(shift['position'] == "floor" for shift in data):
+        data.append(
+            {"shift": "", "date": date, "Start": "05:00", "Finish": "05:00", "substitute_name": "", "is_staff": True, "is_confirmed": True, "position":"floor", "Resource": "Shift"}
+        )
+    if any(shift['position'] == "kitchen" for shift in data):
+        data.append(
+            {"shift": "", "date": date, "Start": "05:00", "Finish": "05:00", "substitute": "", "is_staff": True, "is_confirmed": True, "position":"kitchen", "Resource": "Shift"}
+        )
+    
+    if any(shift['position'] == "all" for shift in data):
+        data.append(
+            {"shift": "", "date": date, "Start": "05:00", "Finish": "05:00", "substitute": "", "is_staff": True, "is_confirmed": True, "position":"all", "Resource": "Shift"}
+        )
+    
     data.append(
-        {"shift": "", "date": date, "Start": "05:00", "Finish": "05:00", "substitute_name": "", "is_staff": False, "is_confirmed": False, "Resource": "Shift"}
-    )
-    data.append(
-        {"shift": "", "date": date, "Start": "23:00", "Finish": "23:00", "substitute": "", "is_staff": False, "is_confirmed": False, "Resource": "Shift"}
+        {"shift": "", "date": date, "Start": "23:00", "Finish": "23:00", "substitute": "", "is_staff": True, "is_confirmed": True, "position":"all", "Resource": "Shift"}
     )
     
+    
     context = {
-        'shifts': shifts,
+        'all_shifts': all_shifts,
+        'kitchen_shifts': kitchen_shifts,
+        'floor_shifts': floor_shifts,
         'data': json.dumps(data),
         'date': date,
         'is_staff': user.is_staff,
@@ -168,9 +188,10 @@ def detail(request, date):
 @login_required
 def new(request):
     user = request.user
+    user_position = "all" if user.position == "chick" else user.position
     form_error = None
     if request.method == "POST":
-        form = ShiftForm(request.POST or None)
+        form = ShiftForm(request.POST or None, initial={'position': user_position})
         if form.is_valid():
             shift = form.save(commit=False)  # データベースにはまだ保存しない
             shift.user = user
@@ -194,13 +215,14 @@ def new(request):
             form_error = form.errors.as_text()  # エラーをテキストとして取得
             form_error = f"勤務時間が{LOWEST_HOUR}時間以上{HIGHEST_HOUR}時間以内になるように調整してください"
     else:
-        form = ShiftForm()
+        form = ShiftForm(initial={'position': "all"})
 
     return render(request, 'app/new.html', {'form': form, 'form_error': form_error})
 
 @login_required
 def edit(request, shift_id):
     user = request.user
+    
     shift = get_object_or_404(Shift, pk=shift_id)
     if shift.user.id != user.id:
         # 元のURLをリファラヘッダから取得
@@ -217,6 +239,7 @@ def edit(request, shift_id):
         "start_minute": shift.start_time.minute,
         "end_hour": shift.end_time.hour,
         "end_minute": shift.end_time.minute,
+        "position":shift.position,
         "memo": shift.memo,
     }
 

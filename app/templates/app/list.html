@@ -12,7 +12,6 @@
       <div class "col-8">
         <div class="container">
           <div class="row">
-    
             <div class="col-12 d-flex justify-content-start align-items-center mb-3" style="white-space: nowrap; overflow: hidden;">
               <div style="width: 20px; height: 20px; background-color: rgba(255, 232, 224, 1.0); border-radius: 50%; margin-right: 10px;"></div>
               <span>確定済</span>
@@ -30,20 +29,26 @@
                 <th>日付</th>
                 <th>開始時間</th>
                 <th>終了時間</th>
-                <th>代役名</th>
+                {% if user.is_staff %}
+                    <th>代役名</th>
+                {% endif %}
+                <th>ポジション</th>
                 <th>ステータス</th>
             </tr>
         </thead>
         <tbody>
             {% for shift in shifts %}
-            <tr class="clickable-row" data-href="/calendar/edit/{{shift.id}}/" style="background-color: 
+            <tr class="clickable-row text-break" data-href="/calendar/edit/{{shift.id}}/" style="background-color: 
                 {% if shift.date >= today and shift.is_confirmed %}#ffe8e0
                 {% elif shift.date <= today %}#e8e8e8  {# より薄い灰色に変更 #}
                 {% else %}#ffffff{% endif %};">
                 <td>{{ shift.date }}</td>
                 <td>{{ shift.start_time }}</td>
                 <td>{{ shift.end_time }}</td>
-                <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
+                {% if user.is_staff %}
+                    <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
+                {% endif %}
+                <td>{% if shift.position == "all" %}FK{% elif shift.position == "floor" %}F{% elif shift.position == "kitchen" %}K{% else %}-{% endif %}</td>
                 <td>{% if shift.is_myself %}確認用{% elif shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td>
             </tr>
             {% endfor %}
