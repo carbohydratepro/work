@@ -25,6 +25,7 @@ class ShiftForm(forms.ModelForm):
         choices=[
             ('kitchen', 'キッチン'),
             ('floor', 'フロア'),
+            ('all', 'オール'),
         ],
         widget=forms.Select(attrs={'id': 'category_select'}),
         required=True,
@@ -44,8 +45,8 @@ class ShiftForm(forms.ModelForm):
 
     def clean(self):
         
-        LOWEST_HOUR = 2
-        HIGHEST_HOUR = 8
+        LOWEST_HOUR = 1
+        HIGHEST_HOUR = 9
         
         cleaned_data = super().clean()
         
