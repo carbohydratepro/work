@@ -238,6 +238,7 @@
                     const shiftUserId = this.getAttribute('data-shift-user-id')
                     const shiftIsConfirmed = this.getAttribute('data-shift-is-confirmed') === 'true';
                     const shiftIsStaff = this.getAttribute('data-shift-is-staff') === 'true';
+                    
 
                     if (shiftUserId === currentUserId.toString() && !shiftIsConfirmed) {  // ShiftのユーザーIDと現在のユーザーIDが一致するか確認
                         const edit_url = `/calendar/edit/${shiftId}/`;
@@ -251,7 +252,7 @@
                             const confirm_url = `/calendar/confirm/${shiftId}/`;
                             window.location.href = confirm_url;  
                         }
-                    } else if (!is_staff && shiftIsStaff && !shiftisConfirmed) {
+                    } else if (!is_staff && shiftIsStaff && !shiftIsConfirmed) {
                         const isConfirmed = confirm("このシフトを確定しますか？\n※この操作は取り消しできません。");
                         if (!isConfirmed) {
                             // ユーザーが「キャンセル」を選択した場合、遷移をキャンセルする
