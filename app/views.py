@@ -14,7 +14,6 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib import messages
 from django.urls import reverse
-from auth_app.models import CustomUser
 
 
 import json
@@ -233,6 +232,7 @@ def edit(request, shift_id):
                 shift.start_time = f"{form.cleaned_data['start_hour']}:{form.cleaned_data['start_minute']}"
                 shift.end_time = f"{form.cleaned_data['end_hour']}:{form.cleaned_data['end_minute']}"
                 shift.save()
+                messages.success(request, "シフトの編集が完了しました")
                 # print(connection.queries) # データベースの状態確認用
                 return redirect('list')
             else:

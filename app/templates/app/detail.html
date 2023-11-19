@@ -14,6 +14,7 @@
                     <th>名前</th>
                     <th>開始時間</th>
                     <th>終了時間</th>
+                    <th>代役名</th>
                     <th>ステータス</th>
                 </tr>
             </thead>
@@ -29,9 +30,10 @@
                         {% if shift.is_confirmed %}#e8e8e8
                         {% elif shift.is_staff %}#ffe0e0
                         {% else %}#e8f8e0{% endif %};">
-                    <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}{{ shift.user.username }}{% endif %}</td>
+                    <td>{% if shift.substitute_name %}-{% else %}{{ shift.user.username }}{% endif %}</td>
                     <td>{{ shift.start_time }}</td>
                     <td>{{ shift.end_time }}</td>
+                    <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
                     <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td>
                 </tr>
                 {% endfor %}
