@@ -20,7 +20,7 @@
             </thead>
             <tbody>
                 {% for shift in shifts %}
-                <tr class="clickable-row text-nowarap"
+                <tr class="clickable-row text-break"
                     data-shift-id="{{ shift.id }}"
                     data-shift-user-id="{{ shift.user_id }}"
                     data-shift-is-confirmed="{{ shift.is_confirmed|yesno:'true,false' }}"
