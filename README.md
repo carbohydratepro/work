@@ -114,11 +114,12 @@ docker-compose exec gunicorn python manage.py collectstatic
    |---|---|---|
    | フレームワーク | Django | 3.2 |
    | 言語 | Python | 3.9 |
-   | 言語 | JavaScript |  |
-   | 言語 | HTML&CSS |  |
    | ライブラリ | psycog2 | 2.8 |
    | ライブラリ | plotly |  |
-   | データベース | PostgeSQL |  |
+   | 言語 | JavaScript |  |
+   | 言語 | HTML&CSS |  |
+   | ライブラリ | Bootstrap |  |
+   | データベース | PostgeSQL | 13 |
    | クラウド/インフラ | DockerDesktop |  |
    | クラウド/インフラ | AWS |  |
    | クラウド/インフラ | AWS/EC2 |  |
