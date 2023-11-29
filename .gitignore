@@ -1,6 +1,8 @@
 *.pyc
 *.env
 *.log
+*.png
+*.jpg
 static_root/
 project/maintenance_mode_state.txt
 django-app-key-work.pem
