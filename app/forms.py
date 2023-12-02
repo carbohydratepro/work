@@ -85,5 +85,5 @@ class ViewTypeForm(forms.Form):
         label="表示方法"
         )
 
-    
-    
+class ImageUploadForm(forms.Form):
+    image = forms.ImageField()

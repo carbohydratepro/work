@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Shift
-from .forms import ShiftForm, ViewTypeForm
+from .forms import ShiftForm, ViewTypeForm, ImageUploadForm
 from django.http import JsonResponse
 from datetime import datetime
 from django.db import connection
@@ -14,12 +14,17 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib import messages
 from django.urls import reverse
+from django.core.files.storage import default_storage
+from io import BytesIO
+from app.ocr import ocr_carbon
 
 
+import numpy as np
 import json
-# import logging
+import logging
+import cv2
 
-# logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 # def your_view(request):
 #     logger.debug('Debug message')
 #     logger.error('Error message')
@@ -344,3 +349,68 @@ def list(request):
     }
     return render(request, 'app/list.html', context)
 
+
+
+@login_required
+def ocr_image(request):    
+    if request.method == 'POST':
+        form = ImageUploadForm(request.POST, request.FILES)
+        if form.is_valid(): 
+            image_file = request.FILES['image']
+            image_stream = BytesIO(image_file.read())
+            image_stream.seek(0)
+            
+            # PILイメージをOpenCVフォーマットに変換
+            file_bytes = np.asarray(bytearray(image_stream.read()), dtype=np.uint8)
+            image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+
+
+            text = ocr_carbon(image)
+            
+            image_url = 'temp/akutagawa.jpg'
+
+                            
+            # try:
+            #     # 画像の前処理
+            #     image = Image.open(image_stream).convert('L')
+            #     image = image.filter(ImageFilter.MedianFilter())
+            #     enhancer = ImageEnhance.Contrast(image)
+            #     image = enhancer.enhance(2)
+            #     image = image.point(lambda x: 0 if x < 140 else 255)
+
+            #     # Tesseractの設定
+            #     custom_config = r'--oem 3 --psm 6'
+            #     text = pytesseract.image_to_string(image, lang='jpn', config=custom_config)
+
+            #     # 画像の一時保存とURLの生成
+            #     temp_image_path = default_storage.save('temp/' + image_file.name, image_file)
+            #     image_url = default_storage.url(temp_image_path)
+                
+
+            #     # 前処理した画像の一時保存
+            #     preprocessed_image_stream = BytesIO()
+            #     image.save(preprocessed_image_stream, format='JPEG')
+            #     preprocessed_image_stream.seek(0)
+            #     temp_preprocessed_image_path = default_storage.save('temp/' + image_file.name, preprocessed_image_stream)
+
+                    
+            # except IOError:
+            #     logger.error("画像の読み込みに失敗しました。")
+            #     text = "画像の読み込みに失敗しました。"
+            #     image_url = None
+            # except pytesseract.TesseractError as e:
+            #     logger.error("Tesseract処理中にエラーが発生しました: %s", e)
+            #     text = "Tesseract処理中にエラーが発生しました。"
+            #     image_url = None
+            # except Exception as e:
+            #     logger.error("画像の処理中にエラーが発生しました: %s", e)
+            #     text = f"エラーが発生しました。{e}"
+            #     image_url = None
+
+                
+            return render(request, 'app/ocr_result.html', {'text': text, 'image_url': image_url})
+
+    else:
+        form = ImageUploadForm()
+
+    return render(request, 'app/ocr_form.html', {'form': form})

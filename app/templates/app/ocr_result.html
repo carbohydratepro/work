@@ -1,0 +1,14 @@
+{% extends "app/base.html" %}
+
+<!-- コンテンツ -->
+{% block content %}
+<h1>result</h1>
+<!-- ocr_result.html -->
+{% if image_url %}
+    <img src="{{ image_url }}" alt="アップロードされた画像">
+{% endif %}
+
+<p>抽出されたテキスト:</p>
+<p>{{ text }}</p>
+
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "app/base.html" %}
+
+<!-- コンテンツ -->
+{% block content %}
+<h1>form</h1>
+<!-- ocr_form.html -->
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">アップロード</button>
+</form>
+
+{% endblock %}
