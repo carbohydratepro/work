@@ -11,4 +11,26 @@
 <p>抽出されたテキスト:</p>
 <p>{{ text }}</p>
 
+<div class="container mt-4">
+  <h2>データ一覧</h2>
+  <table class="table">
+      <thead class="thead-dark">
+          <tr>
+              <th>名前</th>
+              <th>開始時間</th>
+              <th>終了時間</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for row in data %}
+              <tr>
+                  <td>{{ row.0 }}</td>
+                  <td>{{ row.1 }}</td>
+                  <td>{{ row.2 }}</td>
+              </tr>
+          {% endfor %}
+      </tbody>
+  </table>
+</div>
+
 {% endblock %}

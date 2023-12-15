@@ -7,6 +7,7 @@ import pytesseract
 from pytesseract import Output
 from PIL import Image, ImageEnhance, ImageFilter
 
+
 def find_largest_rectangle(image, temp_ocr_path):
     '''最大長方形の抽出'''
     # 画像を読み込み、前処理
@@ -42,6 +43,7 @@ def find_largest_rectangle(image, temp_ocr_path):
         x, y, w, h = cv2.boundingRect(largest_rectangle)
         cropped_result = result[y:y+h, x:x+w]
 
+  
         # 切り取った画像を保存
         cv2.imwrite(f'{temp_ocr_path}/cropped_image.jpg', cropped_result)
         print("最大の長方形の部分を切り取り、保存しました。")

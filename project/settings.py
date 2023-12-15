@@ -182,6 +182,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+#static_rootにある静的ファイルをnginxにコピーすることはできるが、static_rootにコピーすることはできない状態にある。12/13
 STATIC_URL = '/static/'
 
 # デプロイ時追加
