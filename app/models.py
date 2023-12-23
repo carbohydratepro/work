@@ -17,5 +17,19 @@ class Shift(models.Model):
     position = models.CharField(max_length=10, default="all") # chick kitchen floor all
     memo = models.TextField(null=True, default=None, blank=True)
 
+
+class RegisteredShift(models.Model):
+    username = models.CharField(unique=False, max_length=50)
+    date = models.DateField(verbose_name="日付", default=timezone.now)
+    start_time = models.TimeField(verbose_name="開始時間")
+    end_time = models.TimeField(verbose_name="終了時間")
+    position = models.CharField(max_length=10, default="all") # chick kitchen floor all
+    
+    
+class Break(models.Model):
+    shift = models.ForeignKey(RegisteredShift, on_delete=models.CASCADE)
+    start_time = models.TimeField(verbose_name="休憩開始")
+    end_time = models.TimeField(verbose_name="休憩終了")
+
     def __str__(self):
         return self.applicant_name or "未指定"

@@ -13,5 +13,7 @@ urlpatterns = [
     path('confirm/<int:shift_id>/', views.confirm, name='confirm'),
     path('list/', views.list, name='list'),
     path('ocr_image/', views.ocr_image, name='ocr_image'),
+    path('ocr_image/', views.ocr_image, name='ocr_image'),
+    path('registered_new/', views.registered_new, name='registered_new'),
     # path('test', views.test, name='test'),
 ]
