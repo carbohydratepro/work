@@ -5,6 +5,24 @@
 
 <div class="container">
     <h1>{{ date }}</h1>
+    <div class="container">
+        <div class="row">
+          <div class="col-4 d-flex justify-content-start align-items-center mb-3" style="white-space: nowrap; overflow: hidden;">
+            <div style="width: 20px; height: 20px; background-color: rgba(255, 0, 0, 0.7); border-radius: 50%; margin-right: 10px;"></div>
+            <span>不足　</span>
+          </div>
+  
+          <div class="col-4 d-flex justify-content-start align-items-center mb-3" style="white-space: nowrap; overflow: hidden;">
+            <div style="width: 20px; height: 20px; background-color: rgba(0, 128, 0, 0.7); border-radius: 50%; margin-right: 10px;"></div>
+            <span>勤務可</span>
+          </div>
+  
+          <div class="col-4 d-flex justify-content-start align-items-center mb-3" style="white-space: nowrap; overflow: hidden;">
+            <div style="width: 20px; height: 20px; background-color: rgba(128, 128, 128, 0.7); border-radius: 50%; margin-right: 10px;"></div>
+            <span>確定済</span>
+          </div>
+        </div>
+    </div>
     <div id="plotly-div"></div>
 
     {% if floor_shifts %}
@@ -14,8 +32,7 @@
                 <thead>
                     <tr>
                         <th>名前</th>
-                        <th>開始時間</th>
-                        <th>終了時間</th>
+                        <th>勤務時間</th>
                         {% comment %} <th>代役名</th>
                         <th>ステータス</th> {% endcomment %}
                     </tr>
@@ -32,9 +49,13 @@
                             {% if shift.is_confirmed %}#e8e8e8
                             {% elif shift.is_staff %}#ffe0e0
                             {% else %}#e8f8e0{% endif %};">
-                        <td>{% if shift.is_confirmed %}{{ shift.user.username }}{% else %}-{% endif %}</td>
-                        <td>{{ shift.start_time }}</td>
-                        <td>{{ shift.end_time }}</td>
+                        <td>{% if shift.is_confirmed %}{{ shift.username }}{% elif shift.is_staff %}-{% else %}{{ shift.username }}{% endif %}</td>
+                        {% if shift.break_start_time %}
+                            <td>{{ shift.start_time }}-{{ shift.break_start_time }}<br>
+                                {{ shift.break_end_time }}-{{ shift.end_time }}</td>
+                        {% else %}
+                            <td>{{ shift.start_time }}-{{ shift.end_time }}</td>
+                        {% endif %}
                         {% comment %} <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
                         <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td> {% endcomment %}
                     </tr>
@@ -52,8 +73,7 @@
                 <thead>
                     <tr>
                         <th>名前</th>
-                        <th>開始時間</th>
-                        <th>終了時間</th>
+                        <th>勤務時間</th>
                         {% comment %} <th>代役名</th>
                         <th>ステータス</th> {% endcomment %}
                     </tr>
@@ -70,9 +90,13 @@
                             {% if shift.is_confirmed %}#e8e8e8
                             {% elif shift.is_staff %}#ffe0e0
                             {% else %}#e8f8e0{% endif %};">
-                        <td>{% if shift.is_confirmed %}{{ shift.user.username }}{% else %}-{% endif %}</td>
-                        <td>{{ shift.start_time }}</td>
-                        <td>{{ shift.end_time }}</td>
+                        <td>{% if shift.is_confirmed %}{{ shift.username }}{% elif shift.is_staff %}-{% else %}{{ shift.username }}{% endif %}</td>
+                        {% if shift.break_start_time %}
+                            <td>{{ shift.start_time }}-{{ shift.break_start_time }}<br>
+                                {{ shift.break_end_time }}-{{ shift.end_time }}</td>
+                        {% else %}
+                            <td>{{ shift.start_time }}-{{ shift.end_time }}</td>
+                        {% endif %}
                         {% comment %} <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
                         <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td> {% endcomment %}
                     </tr>
@@ -90,8 +114,7 @@
                 <thead>
                     <tr>
                         <th>名前</th>
-                        <th>開始時間</th>
-                        <th>終了時間</th>
+                        <th>勤務時間</th>
                         {% comment %} <th>代役名</th>
                         <th>ステータス</th> {% endcomment %}
                     </tr>
@@ -108,9 +131,14 @@
                             {% if shift.is_confirmed %}#e8e8e8
                             {% elif shift.is_staff %}#ffe0e0
                             {% else %}#e8f8e0{% endif %};">
-                        <td>{% if shift.is_confirmed %}{{ shift.user.username }}{% else %}-{% endif %}</td>
-                        <td>{{ shift.start_time }}</td>
-                        <td>{{ shift.end_time }}</td>
+                        <td>{% if shift.is_confirmed %}{{ shift.username }}{% elif shift.is_staff %}-{% else %}{{ shift.username }}{% endif %}</td>
+                        {% if shift.break_start_time %}
+                            <td>{{ shift.start_time }}-{{ shift.break_start_time }}<br>
+                                {{ shift.break_end_time }}-{{ shift.end_time }}</td>
+                        {% else %}
+                            <td>{{ shift.start_time }}-{{ shift.end_time }}</td>
+                        {% endif %}
+
                         {% comment %} <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
                         <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td> {% endcomment %}
                     </tr>
@@ -138,14 +166,23 @@
             return 4; // 未知のpositionの場合
         }
 
-        // positionに基づいて並べ替え、その後開始時間順に逆ソート
+        // positionに基づいて並べ替え、その後開始時間順に逆ソートし、開始時間が同じ場合は終了時間でソート
         dataInput.sort((a, b) => {
             const positionWeightA = getPositionWeight(a.position);
             const positionWeightB = getPositionWeight(b.position);
             if (positionWeightA !== positionWeightB) {
                 return positionWeightA - positionWeightB;
             }
-            return (a.date + " " + a.Start) < (b.date + " " + b.Start) ? 1 : -1;
+
+            const startA = a.date + " " + a.Start;
+            const startB = b.date + " " + b.Start;
+            if (startA !== startB) {
+                return startA < startB ? 1 : -1;
+            }
+
+            const finishA = a.date + " " + a.Finish;
+            const finishB = b.date + " " + b.Finish;
+            return finishA < finishB ? 1 : -1;
         });
 
         const traces = dataInput.flatMap((d, i) => {
@@ -179,7 +216,7 @@
                     text: '休憩',
                     line: {
                         width: 20,  // シフトと同じ幅
-                        color: 'yellow',  // 休憩時間の色
+                        color: 'rgb(200, 200, 200)'  // 休憩時間の色を薄いグレーに設定
                     }
                 };
             }

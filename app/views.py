@@ -155,10 +155,11 @@ def detail(request, date):
     floor_shifts = Shift.objects.select_related('user').filter(Q(date=date) & (Q(is_myself=False) | Q(user=request.user)) & Q(position="floor"))
 
     # 確定済みシフトの追加
-    registerd_shifts = RegisteredShift.objects.filter(date=date).prefetch_related('break_set')
-    registerd_all_shifts = RegisteredShift.objects.filter(Q(date=date) & Q(position="all")).select_related('break')
-    registerd_kitchen_shifts = RegisteredShift.objects.filter(Q(date=date) & Q(position="kitchen")).select_related('break')
-    registerd_floor_shifts = RegisteredShift.objects.filter(Q(date=date) & Q(position="floor")).select_related('break')
+    registered_shifts = RegisteredShift.objects.filter(date=date).prefetch_related('break_set')
+    registered_all_shifts = RegisteredShift.objects.filter(Q(date=date) & Q(position="all")).prefetch_related('break_set')
+    registered_kitchen_shifts = RegisteredShift.objects.filter(Q(date=date) & Q(position="kitchen")).prefetch_related('break_set')
+    registered_floor_shifts = RegisteredShift.objects.filter(Q(date=date) & Q(position="floor")).prefetch_related('break_set')
+
 
     data = [{
         'id':shift.id,
@@ -175,7 +176,7 @@ def detail(request, date):
         'Resource': 'Shift'
     } for shift in shifts]
     
-    registerd_data = [{
+    registered_data = [{
         'id':shift.id,
         'user_id': None,
         'username': shift.username,
@@ -190,11 +191,99 @@ def detail(request, date):
         'is_confirmed': True,
         'position':shift.position,
         'Resource': 'Shift'
-    } for shift in registerd_shifts]
+    } for shift in registered_shifts]
     
     # データの結合
-    data += registerd_data
+    data += registered_data
 
+    all_data = [{
+        'id':shift.id,
+        'user_id': shift.user.id,
+        'username': shift.user.username,
+        'start_time': shift.start_time.strftime('%H:%M'),
+        'end_time': shift.end_time.strftime('%H:%M'),
+        'break_start_time': None,
+        'break_end_time': None,
+        'substitute_name':shift.substitute_name,
+        'is_staff': shift.is_staff,
+        'is_confirmed':shift.is_confirmed,
+    } for shift in all_shifts]
+    
+    registered_all_data = [{
+        'id':shift.id,
+        'user_id': None,
+        'username': shift.username,
+        'start_time': shift.start_time.strftime('%H:%M'),
+        'end_time': shift.end_time.strftime('%H:%M'),
+        'break_start_time': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() else None,
+        'break_end_time': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() else None,
+        'substitute_name': None,
+        'is_staff': None,
+        'is_confirmed': True,
+    } for shift in registered_all_shifts]
+
+    # データの結合
+    all_data += registered_all_data
+    
+    floor_data = [{
+        'id':shift.id,
+        'user_id': shift.user.id,
+        'username': shift.user.username,
+        'start_time': shift.start_time.strftime('%H:%M'),
+        'end_time': shift.end_time.strftime('%H:%M'),
+        'break_start_time': None,
+        'break_end_time': None,
+        'substitute_name':shift.substitute_name,
+        'is_staff': shift.is_staff,
+        'is_confirmed':shift.is_confirmed,
+    } for shift in floor_shifts]
+    
+    registered_floor_data = [{
+        'id':shift.id,
+        'user_id': None,
+        'username': shift.username,
+        'start_time': shift.start_time.strftime('%H:%M'),
+        'end_time': shift.end_time.strftime('%H:%M'),
+        'break_start_time': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() else None,
+        'break_end_time': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() else None,
+        'substitute_name': None,
+        'is_staff': None,
+        'is_confirmed': True,
+    } for shift in registered_floor_shifts]
+    
+    # データの結合
+    floor_data += registered_floor_data
+
+    kitchen_data = [{
+        'id':shift.id,
+        'user_id': shift.user.id,
+        'username': shift.user.username,
+        'start_time': shift.start_time.strftime('%H:%M'),
+        'end_time': shift.end_time.strftime('%H:%M'),
+        'break_start_time': None,
+        'break_end_time': None,
+        'substitute_name':shift.substitute_name,
+        'is_staff': shift.is_staff,
+        'is_confirmed':shift.is_confirmed,
+    } for shift in kitchen_shifts]
+    
+    registered_kitchen_data = [{
+        'id':shift.id,
+        'user_id': None,
+        'username': shift.username,
+        'start_time': shift.start_time.strftime('%H:%M'),
+        'end_time': shift.end_time.strftime('%H:%M'),
+        'break_start_time': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() else None,
+        'break_end_time': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() else None,
+        'substitute_name': None,
+        'is_staff': None,
+        'is_confirmed': True,
+    } for shift in registered_kitchen_shifts]
+    
+    # データの結合
+    kitchen_data += registered_kitchen_data
+    
+    
     # margin用のフェイクデータ追加
     if any(shift['position'] == "floor" for shift in data):
         data.append(
@@ -216,9 +305,9 @@ def detail(request, date):
     
     
     context = {
-        'all_shifts': all_shifts,
-        'kitchen_shifts': kitchen_shifts,
-        'floor_shifts': floor_shifts,
+        'all_shifts': all_data,
+        'kitchen_shifts': kitchen_data,
+        'floor_shifts': floor_data,
         'data': json.dumps(data),
         'date': date,
         'is_staff': user.is_staff,
