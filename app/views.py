@@ -154,9 +154,16 @@ def detail(request, date):
     kitchen_shifts = Shift.objects.select_related('user').filter(Q(date=date) & (Q(is_myself=False) | Q(user=request.user)) & Q(position="kitchen"))
     floor_shifts = Shift.objects.select_related('user').filter(Q(date=date) & (Q(is_myself=False) | Q(user=request.user)) & Q(position="floor"))
 
+    # 確定済みシフトの追加
+    registerd_shifts = RegisteredShift.objects.filter(date=date).prefetch_related('break_set')
+    registerd_all_shifts = RegisteredShift.objects.filter(Q(date=date) & Q(position="all")).select_related('break')
+    registerd_kitchen_shifts = RegisteredShift.objects.filter(Q(date=date) & Q(position="kitchen")).select_related('break')
+    registerd_floor_shifts = RegisteredShift.objects.filter(Q(date=date) & Q(position="floor")).select_related('break')
+
     data = [{
         'id':shift.id,
         'user_id': shift.user.id,
+        'username': None,
         'shift': shift.substitute_name if shift.substitute_name else shift.applicant_name,
         'date':shift.date.strftime('%Y-%m-%d'),
         'Start': shift.start_time.strftime('%H:%M'),
@@ -168,6 +175,26 @@ def detail(request, date):
         'Resource': 'Shift'
     } for shift in shifts]
     
+    registerd_data = [{
+        'id':shift.id,
+        'user_id': None,
+        'username': shift.username,
+        'shift': shift.username,
+        'date':shift.date.strftime('%Y-%m-%d'),
+        'Start': shift.start_time.strftime('%H:%M'),
+        'Finish': shift.end_time.strftime('%H:%M'),
+        'breakStart': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() else None,
+        'breakFinish': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() else None,
+        'substitute_name': None,
+        'is_staff': None,
+        'is_confirmed': True,
+        'position':shift.position,
+        'Resource': 'Shift'
+    } for shift in registerd_shifts]
+    
+    # データの結合
+    data += registerd_data
+
     # margin用のフェイクデータ追加
     if any(shift['position'] == "floor" for shift in data):
         data.append(

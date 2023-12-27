@@ -16,8 +16,8 @@
                         <th>名前</th>
                         <th>開始時間</th>
                         <th>終了時間</th>
-                        <th>代役名</th>
-                        <th>ステータス</th>
+                        {% comment %} <th>代役名</th>
+                        <th>ステータス</th> {% endcomment %}
                     </tr>
                 </thead>
                 <tbody>
@@ -32,11 +32,11 @@
                             {% if shift.is_confirmed %}#e8e8e8
                             {% elif shift.is_staff %}#ffe0e0
                             {% else %}#e8f8e0{% endif %};">
-                        <td>{% if shift.substitute_name %}-{% else %}{{ shift.user.username }}{% endif %}</td>
+                        <td>{% if shift.is_confirmed %}{{ shift.user.username }}{% else %}-{% endif %}</td>
                         <td>{{ shift.start_time }}</td>
                         <td>{{ shift.end_time }}</td>
-                        <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
-                        <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td>
+                        {% comment %} <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
+                        <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td> {% endcomment %}
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -54,8 +54,8 @@
                         <th>名前</th>
                         <th>開始時間</th>
                         <th>終了時間</th>
-                        <th>代役名</th>
-                        <th>ステータス</th>
+                        {% comment %} <th>代役名</th>
+                        <th>ステータス</th> {% endcomment %}
                     </tr>
                 </thead>
                 <tbody>
@@ -70,11 +70,11 @@
                             {% if shift.is_confirmed %}#e8e8e8
                             {% elif shift.is_staff %}#ffe0e0
                             {% else %}#e8f8e0{% endif %};">
-                        <td>{% if shift.substitute_name %}-{% else %}{{ shift.user.username }}{% endif %}</td>
+                        <td>{% if shift.is_confirmed %}{{ shift.user.username }}{% else %}-{% endif %}</td>
                         <td>{{ shift.start_time }}</td>
                         <td>{{ shift.end_time }}</td>
-                        <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
-                        <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td>
+                        {% comment %} <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
+                        <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td> {% endcomment %}
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -92,8 +92,8 @@
                         <th>名前</th>
                         <th>開始時間</th>
                         <th>終了時間</th>
-                        <th>代役名</th>
-                        <th>ステータス</th>
+                        {% comment %} <th>代役名</th>
+                        <th>ステータス</th> {% endcomment %}
                     </tr>
                 </thead>
                 <tbody>
@@ -108,11 +108,11 @@
                             {% if shift.is_confirmed %}#e8e8e8
                             {% elif shift.is_staff %}#ffe0e0
                             {% else %}#e8f8e0{% endif %};">
-                        <td>{% if shift.substitute_name %}-{% else %}{{ shift.user.username }}{% endif %}</td>
+                        <td>{% if shift.is_confirmed %}{{ shift.user.username }}{% else %}-{% endif %}</td>
                         <td>{{ shift.start_time }}</td>
                         <td>{{ shift.end_time }}</td>
-                        <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
-                        <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td>
+                        {% comment %} <td>{% if shift.substitute_name %}{{ shift.substitute_name }}{% else %}-{% endif %}</td>
+                        <td>{% if shift.is_confirmed %}確定済{% else %}未確定{% endif %}</td> {% endcomment %}
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -148,11 +148,12 @@
             return (a.date + " " + a.Start) < (b.date + " " + b.Start) ? 1 : -1;
         });
 
-        const traces = dataInput.map((d, i) => {
-            const color = !d.is_confirmed && !d.is_staff ? 'green' : 
-                          d.is_confirmed ? 'grey' : 
-                          d.is_staff ? 'red' : 'blue';  // fallback color in case none of the conditions are met
-            return {
+        const traces = dataInput.flatMap((d, i) => {
+            const shiftColor = !d.is_confirmed && !d.is_staff ? 'green' : 
+                               d.is_confirmed ? 'grey' : 
+                               d.is_staff ? 'red' : 'blue';  // シフトの色
+        
+            const shiftTrace = {
                 type: 'scatter',
                 mode: 'lines',
                 x: [d.date + " " + d.Start, d.date + " " + d.Finish],
@@ -161,11 +162,31 @@
                 text: d.shift,
                 line: {
                     width: 20,
-                    color: color,
+                    color: shiftColor,
                 },
                 name: d.shift
             };
+        
+            // 休憩時間がある場合のトレースを追加
+            let breakTrace = null;
+            if (d.breakStart && d.breakFinish) {
+                breakTrace = {
+                    type: 'scatter',
+                    mode: 'lines',
+                    x: [d.date + " " + d.breakStart, d.date + " " + d.breakFinish],
+                    y: [i, i],
+                    hoverinfo: 'text',
+                    text: '休憩',
+                    line: {
+                        width: 20,  // シフトと同じ幅
+                        color: 'yellow',  // 休憩時間の色
+                    }
+                };
+            }
+        
+            return [shiftTrace, breakTrace].filter(trace => trace !== null);
         });
+        
         
         const layout = {
             title: "シフト",
