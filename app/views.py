@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Shift, RegisteredShift, Break
-from .forms import ShiftForm, ViewTypeForm, ImageUploadForm, RegisteredShiftForm
+from .forms import ShiftForm, ViewTypeForm, ImageUploadForm, RegisteredShiftForm, DateForm
 from django import forms
 from django.http import JsonResponse
 from datetime import datetime
@@ -352,24 +352,71 @@ def list(request):
 def registered_new(request):
     user = request.user
     form_error = None
+    selected_date = None
     
     extra_num = int(request.POST.get('extra_num', 1))
+    date_form = DateForm(request.POST or None)
     
+
     RegisteredShiftFormSet = modelformset_factory(
         RegisteredShift,
         form=RegisteredShiftForm,
-        fields=('date', 'username', 'start_hour', 'start_minute', 'end_hour', 'end_minute','break_start_hour', 'break_start_minute', 'break_end_hour', 'break_end_minute', 'position'),
+        fields=('username', 'start_hour', 'start_minute', 'end_hour', 'end_minute','break_start_hour', 'break_start_minute', 'break_end_hour', 'break_end_minute', 'position'),
         extra=extra_num,  # 1つ以上の空のフォームを追加するための数
         can_delete=True  # 既存のシフトを削除可能にするためのフラグ
     )
     if user.is_staff:
         if request.method == "POST":
-            shift_form_set = RegisteredShiftFormSet(request.POST or None)
-            # print(shift_form_set)
+            if date_form.is_valid():
+                selected_date = date_form.cleaned_data['date']
+            
+            print(RegisteredShift.objects.filter(date=selected_date) if selected_date else RegisteredShift.objects.none())
+            
+            if 'change_date' in request.POST:
+                    
+                # request.POSTのコピーを作成
+                mutable_post = request.POST.copy()
+                
+                # form-TOTAL_FORMSの値を更新
+                total_forms = int(mutable_post.get('form-TOTAL_FORMS', 0))
+
+                RegisteredShiftFormSet = modelformset_factory(
+                    RegisteredShift,
+                    form=RegisteredShiftForm,
+                    fields=('date', 'username', 'start_hour', 'start_minute', 'end_hour', 'end_minute','break_start_hour', 'break_start_minute', 'break_end_hour', 'break_end_minute', 'position'),
+                    extra=extra_num,  # 1つ以上の空のフォームを追加するための数
+                    max_num=50,
+                    can_delete=True  # 既存のシフトを削除可能にするためのフラグ
+                )
+                
+                queryset = RegisteredShift.objects.filter(date=selected_date) if selected_date else RegisteredShift.objects.none()
+
+                        
+                shift_form_set = RegisteredShiftFormSet(queryset=queryset)
+                # レンダリングするテンプレートに渡すコンテキスト
+                context = {
+                    'shift_form_set': shift_form_set,
+                    'date_form': date_form,
+                    'form_error': form_error,
+                    'extra_num': extra_num,
+                }
+                return render(request, 'app/registered_shift_new.html', context)
+            
             # 新しいフォームを追加するためのリクエストかどうかを確認
-            if 'add_form' in request.POST:
-                extra_num += 1
-                request.session['extra_num'] = extra_num
+            elif 'add_form' in request.POST or 'delete_form' in request.POST:
+                # request.POSTのコピーを作成
+                mutable_post = request.POST.copy()
+                
+                # form-TOTAL_FORMSの値を更新
+                total_forms = int(mutable_post.get('form-TOTAL_FORMS', 0))
+                
+                if 'delete_form' in request.POST and extra_num > 0:
+                    extra_num -= 1
+                    mutable_post['form-TOTAL_FORMS'] = str(total_forms - 1)
+                else:
+                    extra_num += 1
+                    mutable_post['form-TOTAL_FORMS'] = str(total_forms + 1)
+                # request.session['extra_num'] = extra_num
                 
                 RegisteredShiftFormSet = modelformset_factory(
                     RegisteredShift,
@@ -380,48 +427,54 @@ def registered_new(request):
                     can_delete=True  # 既存のシフトを削除可能にするためのフラグ
                 )
                 
-                # request.POSTのコピーを作成
-                mutable_post = request.POST.copy()
-                
-                # form-TOTAL_FORMSの値を更新
-                total_forms = int(mutable_post.get('form-TOTAL_FORMS', 0))
-                mutable_post['form-TOTAL_FORMS'] = str(total_forms + 1)
-                
-                shift_form_set = RegisteredShiftFormSet(mutable_post)
+                queryset = RegisteredShift.objects.filter(date=selected_date) if selected_date else RegisteredShift.objects.none()
+                shift_form_set = RegisteredShiftFormSet(mutable_post, queryset=queryset)
                 # レンダリングするテンプレートに渡すコンテキスト
                 context = {
                     'shift_form_set': shift_form_set,
+                    'date_form': date_form,
                     'form_error': form_error,
                     'extra_num': extra_num,
                 }
                 return render(request, 'app/registered_shift_new.html', context)
             else:
+                queryset = RegisteredShift.objects.filter(date=selected_date) if selected_date else RegisteredShift.objects.none()
+                shift_form_set = RegisteredShiftFormSet(request.POST, queryset=queryset)
                 if shift_form_set.is_valid():
                     shift_instances = shift_form_set.save(commit=False)
                     for shift_form in shift_form_set.forms:
                         shift_instance = shift_form.save(commit=False)
 
+                        shift_instance.date = date_form.cleaned_data['date']
                         shift_instance.start_time = f"{shift_form.cleaned_data['start_hour']}:{shift_form.cleaned_data['start_minute']}"
                         shift_instance.end_time = f"{shift_form.cleaned_data['end_hour']}:{shift_form.cleaned_data['end_minute']}"
                         shift_instance.save()  # ここでシフトを保存します
 
-                        # 休憩インスタンスを作成し、シフトを外部キーとして設定します
-                        break_instance = Break(
-                            shift = shift_instance,
-                            start_time  = f"{shift_form_set.cleaned_data['break_start_hour']}:{shift_form_set.cleaned_data['break_start_minute']}",
-                            end_time = f"{shift_form_set.cleaned_data['break_end_hour']}:{shift_form_set.cleaned_data['break_end_minute']}"
-                        )
-                        break_instance.save()  # ここで休憩時間を保存します
+                        # 休憩インスタンスの更新または作成
+                        if hasattr(shift_form, 'cleaned_data'):
+                            break_data = {
+                                'shift': shift_instance,
+                                'start_time': f"{shift_form.cleaned_data['break_start_hour']}:{shift_form.cleaned_data['break_start_minute']}",
+                                'end_time': f"{shift_form.cleaned_data['break_end_hour']}:{shift_form.cleaned_data['break_end_minute']}"
+                            }
+                            Break.objects.update_or_create(shift=shift_instance, defaults=break_data)
+                        
+                    for shift_instance in shift_form_set.deleted_objects:
+                        shift_instance.delete()  # 削除チェックされたインスタンスを削除
 
-                    # カレンダー表示のページにリダイレクトします
-                    return redirect('display-calendar')  # 後でdetails/dateか確認画面に遷移するように設定
+                    return redirect('registered_new')  # 後でdetails/dateか確認画面に遷移するように設定
                 else:
                     # フォームのエラーを結合して表示
-                    form_error = shift_form_set.errors.as_text()
+                    form_errors = [form.errors.as_text() for form in shift_form_set.forms if form.errors]
+                    for i, form_error in enumerate(form_errors):
+                        if form_error == "":
+                            form_errors[i] = f"勤務時間が{LOWEST_HOUR}時間以上{HIGHEST_HOUR}時間以内になるように調整してください"
+                        
+                    form_error = '\n'.join(form_errors)
         else:
             # GETリクエストでフォームを初期化します
-            print("pass")
-            shift_form_set = RegisteredShiftFormSet()
+            queryset = RegisteredShift.objects.filter(date=selected_date) if selected_date else RegisteredShift.objects.none()
+            shift_form_set = RegisteredShiftFormSet(queryset=queryset)
     else:
         # スタッフでないユーザーはリファラURLにリダイレクトされます
         referer_url = request.META.get('HTTP_REFERER', reverse('display-calendar'))
@@ -430,6 +483,7 @@ def registered_new(request):
     # レンダリングするテンプレートに渡すコンテキスト
     context = {
         'shift_form_set': shift_form_set,
+        'date_form': date_form,
         'form_error': form_error,
         'extra_num': extra_num,
     }

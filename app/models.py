@@ -16,7 +16,9 @@ class Shift(models.Model):
     is_myself = models.BooleanField(default=False)
     position = models.CharField(max_length=10, default="all") # chick kitchen floor all
     memo = models.TextField(null=True, default=None, blank=True)
-
+    
+    def __str__(self):
+        return self.applicant_name or "未指定"
 
 class RegisteredShift(models.Model):
     username = models.CharField(unique=False, max_length=50)
@@ -25,6 +27,8 @@ class RegisteredShift(models.Model):
     end_time = models.TimeField(verbose_name="終了時間")
     position = models.CharField(max_length=10, default="all") # chick kitchen floor all
     
+    def __str__(self):
+        return self.username or "未指定"
     
 class Break(models.Model):
     shift = models.ForeignKey(RegisteredShift, on_delete=models.CASCADE)
@@ -32,4 +36,4 @@ class Break(models.Model):
     end_time = models.TimeField(verbose_name="休憩終了")
 
     def __str__(self):
-        return self.applicant_name or "未指定"
+        return self.shift.username or "未指定"
