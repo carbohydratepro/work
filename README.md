@@ -40,6 +40,8 @@ docker-compose exec gunicorn python manage.py collectstatic
 ```text
 docker-compose exec gunicorn maintenance-mode on
 docker-compose down
+git status # ブランチ確認
+git pull origin main
 docker-compose up -d --build
 docker-compose exec gunicorn python manage.py makemigrations
 docker-compose exec gunicorn python manage.py migrate
