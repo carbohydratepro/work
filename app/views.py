@@ -91,6 +91,22 @@ def get_events(request):
         'color': 'rgba(128, 128, 128, 0.5)' if event.is_confirmed else ('rgba(255, 0, 0, 0.5)' if event.is_staff else 'rgba(0, 128, 0, 0.5)')
     } for event in events]
 
+
+    # 確定済みシフトの有無
+    registered_events = RegisteredShift.objects.filter(date__range=[start_date, end_date])
+    
+    registered_data = [{
+        'title': '',
+        'user_id': '',
+        'substitute_user_id': None,
+        'start': event.date.strftime('%Y-%m-%d'),
+        'overlap': False,
+        'display': "background",
+        'color': 'rgba(128, 128, 128, 0.5)'
+    } for event in registered_events]
+    
+    data += registered_data
+    
     # 重複するstart日付を特定
     duplicated_starts = set()
     start_counts = {}
@@ -142,7 +158,11 @@ def get_events(request):
 @login_required
 def check_shift_exists(request, date):
     exists = Shift.objects.filter(Q(date=date) & (Q(is_myself=False) | Q(user=request.user))).exists()
-    print(exists)
+    
+    # 確定済みシフトの有無
+    registered_exists = RegisteredShift.objects.filter(date=date).exists()
+    
+    exists = exists or registered_exists
     return JsonResponse({'exists': exists})
 
 @login_required
@@ -159,7 +179,6 @@ def detail(request, date):
     registered_all_shifts = RegisteredShift.objects.filter(Q(date=date) & Q(position="all")).prefetch_related('break_set')
     registered_kitchen_shifts = RegisteredShift.objects.filter(Q(date=date) & Q(position="kitchen")).prefetch_related('break_set')
     registered_floor_shifts = RegisteredShift.objects.filter(Q(date=date) & Q(position="floor")).prefetch_related('break_set')
-
 
     data = [{
         'id':shift.id,
@@ -184,8 +203,8 @@ def detail(request, date):
         'date':shift.date.strftime('%Y-%m-%d'),
         'Start': shift.start_time.strftime('%H:%M'),
         'Finish': shift.end_time.strftime('%H:%M'),
-        'breakStart': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() else None,
-        'breakFinish': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() else None,
+        'breakStart': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().start_time.strftime('%H:%M') != '00:00' else None,
+        'break_end_time': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().end_time.strftime('%H:%M') != '00:00' else None,
         'substitute_name': None,
         'is_staff': None,
         'is_confirmed': True,
@@ -215,8 +234,8 @@ def detail(request, date):
         'username': shift.username,
         'start_time': shift.start_time.strftime('%H:%M'),
         'end_time': shift.end_time.strftime('%H:%M'),
-        'break_start_time': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() else None,
-        'break_end_time': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() else None,
+        'break_start_time': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().start_time.strftime('%H:%M') != '00:00' else None,
+        'break_end_time': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().end_time.strftime('%H:%M') != '00:00' else None,
         'substitute_name': None,
         'is_staff': None,
         'is_confirmed': True,
@@ -244,8 +263,8 @@ def detail(request, date):
         'username': shift.username,
         'start_time': shift.start_time.strftime('%H:%M'),
         'end_time': shift.end_time.strftime('%H:%M'),
-        'break_start_time': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() else None,
-        'break_end_time': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() else None,
+        'break_start_time': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().start_time.strftime('%H:%M') != '00:00' else None,
+        'break_end_time': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().end_time.strftime('%H:%M') != '00:00' else None,
         'substitute_name': None,
         'is_staff': None,
         'is_confirmed': True,
@@ -273,8 +292,8 @@ def detail(request, date):
         'username': shift.username,
         'start_time': shift.start_time.strftime('%H:%M'),
         'end_time': shift.end_time.strftime('%H:%M'),
-        'break_start_time': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() else None,
-        'break_end_time': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() else None,
+        'break_start_time': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().start_time.strftime('%H:%M') != 0 else None,
+        'break_end_time': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().end_time.strftime('%H:%M') != 0 else None,
         'substitute_name': None,
         'is_staff': None,
         'is_confirmed': True,
@@ -282,7 +301,6 @@ def detail(request, date):
     
     # データの結合
     kitchen_data += registered_kitchen_data
-    
     
     # margin用のフェイクデータ追加
     if any(shift['position'] == "floor" for shift in data):
