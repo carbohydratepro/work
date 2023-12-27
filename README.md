@@ -22,6 +22,20 @@ docker-compose down
 docker-compose exec web python --version
 ```
 
+### 1. 開発環境時コマンド
+```text
+docker-compose -f docker-compose-dev.yml [down, build, up, exec...]
+```
+
+### 2. 本番環境時コマンド
+```text
+docker-compose build
+docker-compose up -d
+docker-compose exec gunicorn python manage.py makemigrations
+docker-compose exec gunicorn python manage.py migrate
+docker-compose exec gunicorn python manage.py collectstatic
+```
+
 ### 999. コマンド
 データベースの構成を完全削除してから作り直す方法
 ```text
@@ -98,14 +112,23 @@ docker-compose exec gunicorn python manage.py collectstatic
 ### 使用技術
    | 要素 | 名称 | バージョン |
    |---|---|---|
-   | フレームワーク | Django |  |
+   | フレームワーク | Django | 3.2 |
    | 言語 | Python | 3.9 |
+   | ライブラリ | psycog2 | 2.8 |
+   | ライブラリ | plotly |  |
    | 言語 | JavaScript |  |
    | 言語 | HTML&CSS |  |
-   | データベース | PostgeSQL |  |
+   | ライブラリ | Bootstrap |  |
+   | データベース | PostgeSQL | 13 |
    | クラウド/インフラ | DockerDesktop |  |
    | クラウド/インフラ | AWS |  |
-   | ライブラリ | 気が向いたら記述 |  |
+   | クラウド/インフラ | AWS/EC2 |  |
+   | クラウド/インフラ | AWS/CloudFront |  |
+   | クラウド/インフラ | AWS/RDS |  |
+   | クラウド/インフラ | AWS/Route 53 |  |
+   | クラウド/インフラ | AWS/CostExplorer |  |
+   | サーバー | Nginx | 1.17.7 |
+   | サーバー | Gunicorn | 20.1.0 |
    
 ### 参考
 ###### plotly
@@ -132,10 +155,21 @@ https://zenn.dev/tmasuyama1114/articles/ec2-linux-git-install
 ###### static読み込めないエラーの解消
 ```text
 https://zenn.dev/leon0305/articles/8518e520e3b5ca
+https://qiita.com/saira/items/a1c565c4a2eace268a07
 ```
 
 ###### デプロイ（セキュリティー強化）
 ```text
 https://qiita.com/sindicum/items/620ba2984b6729e3a576
 https://qiita.com/Bashi50/items/d5bc47eeb9668304aaa2
+```
+
+###### 管理者サイト
+```text
+https://qiita.com/ryo-keima/items/2bb55c05a79929ec9e71
+```
+
+##### 画像処理
+```text
+https://qiita.com/sitar-harmonics/items/ac584f99043574670cf3
 ```
