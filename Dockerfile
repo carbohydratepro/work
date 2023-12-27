@@ -13,6 +13,18 @@ WORKDIR /code
 COPY requirements.txt /code/
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
+# Tesseract-OCRのインストール
+RUN apt-get update && apt-get install -y tesseract-ocr-jpn
+
+
+# Tesseractの最適化された日本語データのダウンロードとインストール
+RUN apt-get install -y wget && \
+    wget https://github.com/tesseract-ocr/tessdata_best/blob/master/jpn.traineddata -P /usr/share/tesseract-ocr/4.00/tessdata/ && \
+    wget https://github.com/tesseract-ocr/tessdata_best/blob/master/jpn_vert.traineddata -P /usr/share/tesseract-ocr/4.00/tessdata/
+
+# libGL のインストール
+RUN apt-get install -y libgl1-mesa-glx
+
 # メモリを解放するためにキャッシュを削除
 RUN rm -rf /root/.cache/pip/
 

@@ -1,0 +1,75 @@
+{% extends "app/base.html" %}
+{% block content %}
+    <style>
+    @media (max-width: 768px) {
+        .responsive-table {
+        display: block;
+        overflow-x: auto;
+        }
+        .responsive-table th,
+        .responsive-table td {
+        white-space: nowrap;
+        }
+    }
+    </style>
+
+    <div class="container">
+        <div class="col-md-10 offset-md-1">
+            <div class="card p-3 mt-3 mb-3">
+                <h2 class="text-center mt-3">ワースケ登録フォーム</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ shift_form_set.management_form }}
+                    
+                    <!-- 日付フィールドはここで1回だけ表示 -->
+                    <div class="form-group">
+                        <label for="date">日付</label>
+                        {{ date_form.date }}
+                        <button name="change_date" type="submit">シフトを表示</button>
+                    </div>
+
+                    <div class="responsive-table">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">名前</th>
+                                    <th class="text-center">勤務時間</th>
+                                    <th class="text-center">休憩時間</th>
+                                    <th class="text-center">ポジション</th>
+                                    <th class="text-center">削除</th> <!-- 削除列の追加 -->
+                                </tr>
+                            </thead>
+                            <tbody id="formset-container">
+                                <!-- フォームの各行をループで表示 -->
+                                {% for shift_form in shift_form_set %}
+                                <tr class="formset-row">
+                                    {{ shift_form.id }}
+                                    <td>{{ shift_form.username }}</td>
+                                    <td>{{ shift_form.start_hour }}：{{ shift_form.start_minute }}〜{{ shift_form.end_hour }}：{{ shift_form.end_minute }}</td>
+                                    <td>{{ shift_form.break_start_hour }}：{{ shift_form.break_start_minute }}〜{{ shift_form.break_end_hour }}：{{ shift_form.break_end_minute }}</td>
+                                    <td>{{ shift_form.position }}</td>
+                                    <td>{{ shift_form.DELETE }} <!-- 削除チェックボックスの追加 -->
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 新しいフォームを追加するボタン -->
+                    <input type="hidden" name="extra_num" value="{{ extra_num }}" />
+
+                    <button name="add_form" type="submit">新しいフォームを追加</button>
+                    <button name="delete_form" type="submit">フォームを一つ削除</button>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">登録</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+{% endblock %}
+
+

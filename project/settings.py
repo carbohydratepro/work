@@ -28,6 +28,27 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
+# settings.py
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'app': {  # 'your_app_name' をアプリケーションの名前に置き換えてください
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
+}
 
 # LOGGING = {
 #     'version': 1,
@@ -161,6 +182,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+#static_rootにある静的ファイルをnginxにコピーすることはできるが、static_rootにコピーすることはできない状態にある。12/13
 STATIC_URL = '/static/'
 
 # デプロイ時追加
