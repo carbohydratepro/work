@@ -38,14 +38,14 @@ docker-compose exec gunicorn python manage.py collectstatic
 
 ### 101. メンテナンスモード及び実行
 ```text
-docker-compose exec gunicorn maintenance-mode on
+docker-compose exec gunicorn python manage.py maintenance_mode on
 docker-compose down
 git status # ブランチ確認
 git pull origin main
 docker-compose up -d --build
 docker-compose exec gunicorn python manage.py makemigrations
 docker-compose exec gunicorn python manage.py migrate
-docker-compose exec gunicorn maintenance-mode off
+docker-compose exec gunicorn python manage.py maintenance_mode off
 ```
 
 ### 999. コマンド
