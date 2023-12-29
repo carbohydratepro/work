@@ -88,7 +88,7 @@ def get_events(request):
         'start': event.date.strftime('%Y-%m-%d'),
         'overlap': False,
         'display': "background",
-        'color': 'rgba(128, 128, 128, 0.5)' if event.is_confirmed else ('rgba(255, 0, 0, 0.5)' if event.is_staff else 'rgba(0, 128, 0, 0.5)')
+        'color': 'rgba(173, 216, 230, 255)' if event.is_confirmed else ('rgba(255, 0, 0, 0.5)' if event.is_staff else 'rgba(0, 128, 0, 0.5)')
     } for event in events]
 
 
@@ -102,7 +102,7 @@ def get_events(request):
         'start': event.date.strftime('%Y-%m-%d'),
         'overlap': False,
         'display': "background",
-        'color': 'rgba(128, 128, 128, 0.5)'
+        'color': 'rgba(173, 216, 230, 255)'
     } for event in registered_events]
     
     data += registered_data
@@ -127,8 +127,8 @@ def get_events(request):
         else:
             color = request.user.view_type
             if color == 'mix':
-                # 'mix' の場合は、色の優先順位は 灰色 < 緑色 < 赤色 とする
-                color_priority = {'rgba(128, 128, 128, 0.5)': 0, 'rgba(0, 128, 0, 0.5)': 100, 'rgba(255, 0, 0, 0.5)': 200}
+                # 'mix' の場合は、色の優先順位は 水色 < 緑色 < 赤色 とする
+                color_priority = {'rgba(173, 216, 230, 255)': 0, 'rgba(0, 128, 0, 0.5)': 100, 'rgba(255, 0, 0, 0.5)': 200}
                 # 最も優先度の高い色を選択する
                 max_priority = max(color_priority[item['color']] for item in relevant_items)
                 # 最も優先度の高い色のアイテムのみをフィルタリングする
@@ -139,7 +139,7 @@ def get_events(request):
                 rgba_color_map = {
                     'red': 'rgba(255, 0, 0, 0.5)',
                     'green': 'rgba(0, 128, 0, 0.5)',
-                    'grey': 'rgba(128, 128, 128, 0.5)'
+                    'blue': 'rgba(173, 216, 230, 255)'
                 }
                 selected_rgba_color = rgba_color_map[color]
                 filtered_items = [item for item in relevant_items if item['color'] == selected_rgba_color]
@@ -204,7 +204,7 @@ def detail(request, date):
         'Start': shift.start_time.strftime('%H:%M'),
         'Finish': shift.end_time.strftime('%H:%M'),
         'breakStart': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().start_time.strftime('%H:%M') != '00:00' else None,
-        'break_end_time': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().end_time.strftime('%H:%M') != '00:00' else None,
+        'breakFinish': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().end_time.strftime('%H:%M') != '00:00' else None,
         'substitute_name': None,
         'is_staff': None,
         'is_confirmed': True,
@@ -292,8 +292,8 @@ def detail(request, date):
         'username': shift.username,
         'start_time': shift.start_time.strftime('%H:%M'),
         'end_time': shift.end_time.strftime('%H:%M'),
-        'break_start_time': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().start_time.strftime('%H:%M') != 0 else None,
-        'break_end_time': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().end_time.strftime('%H:%M') != 0 else None,
+        'break_start_time': shift.break_set.first().start_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().start_time.strftime('%H:%M') != '00:00' else None,
+        'break_end_time': shift.break_set.first().end_time.strftime('%H:%M') if shift.break_set.exists() and shift.break_set.first().end_time.strftime('%H:%M') != '00:00' else None,
         'substitute_name': None,
         'is_staff': None,
         'is_confirmed': True,
