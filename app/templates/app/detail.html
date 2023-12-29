@@ -19,7 +19,7 @@
           </div>
   
           <div class="col-4 d-flex justify-content-start align-items-center mb-3" style="white-space: nowrap; overflow: hidden;">
-            <div style="width: 20px; height: 20px; background-color: rgba(128, 128, 128, 0.7); border-radius: 50%; margin-right: 10px;"></div>
+            <div style="width: 20px; height: 20px; background-color: rgba(173, 216, 230, 255); border-radius: 50%; margin-right: 10px;"></div>
             <span>確定済</span>
           </div>
         </div>
@@ -47,7 +47,7 @@
                         data-shift-is-staff="{{ shift.is_staff|yesno:'true,false' }}"
 
                         style="background-color: 
-                            {% if shift.is_confirmed %}#e8e8e8
+                            {% if shift.is_confirmed %}#bddfeb
                             {% elif shift.is_staff %}#ffe0e0
                             {% else %}#e8f8e0{% endif %};">
                         <td>{% if shift.is_confirmed %}{{ shift.username }}{% elif shift.is_staff %}-{% else %}{{ shift.username }}{% endif %}</td>
@@ -88,7 +88,7 @@
                         data-shift-is-staff="{{ shift.is_staff|yesno:'true,false' }}"
 
                         style="background-color: 
-                            {% if shift.is_confirmed %}#e8e8e8
+                            {% if shift.is_confirmed %}#bddfeb
                             {% elif shift.is_staff %}#ffe0e0
                             {% else %}#e8f8e0{% endif %};">
                         <td>{% if shift.is_confirmed %}{{ shift.username }}{% elif shift.is_staff %}-{% else %}{{ shift.username }}{% endif %}</td>
@@ -129,7 +129,7 @@
                         data-shift-is-staff="{{ shift.is_staff|yesno:'true,false' }}"
 
                         style="background-color: 
-                            {% if shift.is_confirmed %}#e8e8e8
+                            {% if shift.is_confirmed %}#bddfeb
                             {% elif shift.is_staff %}#ffe0e0
                             {% else %}#e8f8e0{% endif %};">
                         <td>{% if shift.is_confirmed %}{{ shift.username }}{% elif shift.is_staff %}-{% else %}{{ shift.username }}{% endif %}</td>
@@ -188,7 +188,7 @@
 
         const traces = dataInput.flatMap((d, i) => {
             const shiftColor = !d.is_confirmed && !d.is_staff ? 'green' : 
-                               d.is_confirmed ? 'grey' : 
+                               d.is_confirmed ? 'rgba(173, 216, 230, 255)' : 
                                d.is_staff ? 'red' : 'blue';  // シフトの色
         
             const shiftTrace = {
@@ -217,7 +217,7 @@
                     text: '休憩',
                     line: {
                         width: 20,  // シフトと同じ幅
-                        color: 'rgb(200, 200, 200)'  // 休憩時間の色を薄いグレーに設定
+                        color: 'rgb (255, 255, 224, 255)' // rgb (255, 255, 224, 255) // 休憩時間の色を薄い黄色に設定
                     }
                 };
             }

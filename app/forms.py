@@ -77,7 +77,7 @@ class ViewTypeForm(forms.Form):
             ('mix', 'すべて表示'),
             ('red', '不足のみを表示'),
             ('green', '勤務可能のみを表示'),
-            ('grey', '確定済みのみを表示'),
+            ('blue', '確定済みのみを表示'),
             ('me', '自分のシフトのみを表示'),
         ],
         widget=forms.Select(attrs={'id': 'category_select'}),
