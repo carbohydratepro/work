@@ -9,3 +9,4 @@ pytesseract
 Pillow
 pyocr
 opencv-python
+matplotlib

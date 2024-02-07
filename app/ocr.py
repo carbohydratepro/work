@@ -170,6 +170,70 @@ def extract_text(dirs, temp_ocr_path):
     
     return texts
     
+# ===========================================================================
+
+def read_coordinates(file_path):
+    """テキストファイルから座標データを読み込み、Y座標の小さい順にソートした後、ファイル名をキーとする辞書を返す"""
+    coordinates = {}
+    with open(file_path, 'r') as file:
+        for line in file:
+            parts = line.strip().split(' - ')
+            coords_part = parts[0]
+            file_name = parts[1]
+            # Y座標に基づいて各座標をソート
+            coords = sorted([tuple(map(int, coord.strip('()').split(','))) for coord in coords_part.split()], key=lambda x: x[1])
+            coordinates[file_name] = coords
+    return coordinates
+
+
+
+def extract_text_test(dir, temp_ocr_path):
+    """指定されたディレクトリから画像のテキストを抽出する"""
+    texts = {}
+    for file_path in os.listdir(f"{temp_ocr_path}/{dir}"):
+        if file_path.endswith(".jpg"):  # 'rectangles.txt'を除外
+            image = Image.open(f"{temp_ocr_path}/{dir}/{file_path}").convert('L')
+            image = image.filter(ImageFilter.MedianFilter())
+            image = image.point(lambda x: 0 if x < 140 else 255)
+            custom_config = r'--oem 3 --psm 7'
+            text = pytesseract.image_to_string(image, lang='jpn', config=custom_config)
+            texts[file_path] = text.strip()
+    return texts
+
+def associate_texts(texts_img1, texts_img2, coordinates_img1, coordinates_img2):
+    """テキストデータと座標データを関連付けて、Y軸でソートする"""
+    associations = []
+    for file_path1, text1 in texts_img1.items():
+        closest_match = None
+        closest_distance = float('inf')  # 初期値を無限大に設定
+        y_coordinate = None  # Y座標の値を保持する変数
+        for file_path2, text2 in texts_img2.items():
+            distance = calculate_distance(coordinates_img1[file_path1], coordinates_img2[file_path2])
+            if distance < closest_distance:
+                closest_distance = distance
+                closest_match = (file_path2, text2)
+                y_coordinate = min(coordinates_img2[file_path2], key=lambda x: x[1])[1]  # Y軸の最小値を使用
+        if closest_match:
+            associations.append((text1, closest_match[1], y_coordinate))
+        else:
+            associations.append((text1, None, y_coordinate))
+    
+    # Y軸の値に基づいてソート
+    associations.sort(key=lambda x: x[2])
+    
+    # Y座標を結果から削除して返す（必要に応じて）
+    return [(text1, text2) for text1, text2, _ in associations]
+
+
+def calculate_distance(coords1, coords2):
+    """座標間の距離を計算する簡単な例（中心点の距離を使用）"""
+    center1 = ((coords1[0][0] + coords1[2][0]) / 2, (coords1[0][1] + coords1[2][1]) / 2)
+    center2 = ((coords2[0][0] + coords2[2][0]) / 2, (coords2[0][1] + coords2[2][1]) / 2)
+    return ((center1[0] - center2[0]) ** 2 + (center1[1] - center2[1]) ** 2) ** 0.5
+
+
+# ============================================================================
+
 def ocr_carbon(image):
     temp_ocr_path = "temp_ocr"
     if not os.path.exists(temp_ocr_path):
@@ -208,4 +272,13 @@ def ocr_carbon(image):
     # 四角形に基づいて画像を切り抜き、保存 & 情報をテキストファイルに保存
     crop_save_and_check_text_with_coordinates(image, squares, ranges_directories, temp_ocr_path)
     
-    return extract_text(dirs, temp_ocr_path)
+    
+    # 以下の関数を使用してデータを処理
+    texts_img1 = extract_text_test("img1", temp_ocr_path)
+    texts_img2 = extract_text_test("img2", temp_ocr_path)
+    coordinates_img1 = read_coordinates(os.path.join(temp_ocr_path, "img1", "rectangles.txt"))
+    coordinates_img2 = read_coordinates(os.path.join(temp_ocr_path, "img2", "rectangles.txt"))
+    associations = associate_texts(texts_img1, texts_img2, coordinates_img1, coordinates_img2)
+
+    
+    return associations

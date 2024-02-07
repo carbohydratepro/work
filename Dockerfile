@@ -30,7 +30,8 @@ RUN rm -rf /root/.cache/pip/
 
 # gunicorn環境セッティング
 RUN mkdir -p /var/run/gunicorn
-CMD ["gunicorn", "project.wsgi:application", "--bind=unix:/var/run/gunicorn/gunicorn.sock"]
+CMD ["gunicorn", "project.wsgi:application", "--bind=unix:/var/run/gunicorn/gunicorn.sock", "--timeout", "120"]
+
 
 # プロジェクトのファイルをコンテナにコピー
 COPY . /code/

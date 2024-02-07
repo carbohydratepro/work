@@ -637,14 +637,10 @@ def ocr_image(request):
             image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
 
-            text = ocr_carbon(image)
+            data = ocr_carbon(image)
             
             image_url = 'temp/akutagawa.jpg'
-            data = [
-                ['Alice', '09:00', '17:00'],
-                ['Bob', '10:00', '18:00'],
-                # その他のデータ行...
-            ]
+
                             
             # try:
             #     # 画像の前処理
@@ -684,7 +680,7 @@ def ocr_image(request):
             #     image_url = None
 
                 
-            return render(request, 'app/ocr_result.html', {'data':data, 'text':text, 'image_url': image_url})
+            return render(request, 'app/ocr_result.html', {'data':data, 'image_url': image_url})
 
     else:
         form = ImageUploadForm()
