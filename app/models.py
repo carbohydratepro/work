@@ -29,11 +29,11 @@ class RegisteredShift(models.Model):
     
     def __str__(self):
         return self.username or "未指定"
-    
+
 class Break(models.Model):
     shift = models.ForeignKey(RegisteredShift, on_delete=models.CASCADE)
     start_time = models.TimeField(verbose_name="休憩開始")
     end_time = models.TimeField(verbose_name="休憩終了")
 
     def __str__(self):
-        return self.shift.username or "未指定"
+        return self.shift.username or "未指定"  
