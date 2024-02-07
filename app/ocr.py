@@ -118,6 +118,35 @@ def findSquares(bin_image, image, cond_area=1000):
             squares.append(rcnt)
     return squares
 
+def contains_text(image):
+    """画像内のテキストを検出して、テキストが存在するかどうかを返す"""
+    extracted_text = pytesseract.image_to_string(image)
+    return len(extracted_text.strip()) > 0
+
+def crop_save_and_check_text_with_coordinates(image, rectangles, ranges_directories, temp_ocr_path):
+    """矩形に基づいて画像を切り抜き、保存（幅の条件付き）、テキストが含まれているか判定し、座標を保存"""
+    img_width = image.shape[1]
+
+    for (min_percent, max_percent, width_percent_range, output_dir) in ranges_directories:
+        min_x = int(img_width * min_percent / 100)
+        max_x = int(img_width * max_percent / 100)
+        if not os.path.exists(f"{temp_ocr_path}/{output_dir}"):
+            os.makedirs(f"{temp_ocr_path}/{output_dir}")
+        coordinates_file_path = f'{temp_ocr_path}/{output_dir}/rectangles.txt'
+        with open(coordinates_file_path, 'w') as f:
+            for i, rect in enumerate(rectangles):
+                x, y, w, h = cv2.boundingRect(rect)
+                rect_width_percent = (w / img_width) * 100
+
+                if width_percent_range[0] <= rect_width_percent <= width_percent_range[1] and x >= min_x and x + w <= max_x:
+                    cropped_image = image[y:y+h, x:x+w]
+                    cropped_pil_image = Image.fromarray(cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB))
+                    
+                    if contains_text(cropped_pil_image):
+                        filename = f'rectangle_{i+1}.jpg'
+                        cv2.imwrite(os.path.join(temp_ocr_path, output_dir, filename), cropped_image)
+                        coordinates = ' '.join([f'({cx},{cy})' for cx, cy in rect])
+                        f.write(f'{coordinates} - {filename}\n')
 
 def extract_text(dirs, temp_ocr_path):
     '''OCRを行う関数(多分精度重視)'''
@@ -176,10 +205,7 @@ def ocr_carbon(image):
     
     dirs = ['img1', 'img2']
 
-    # 四角形に基づいて画像を切り抜き、保存
-    crop_and_save(image, squares, ranges_directories, temp_ocr_path)
-    
-    # 四角形の座標をファイルに保存
-    save_rectangles(squares, img_width, ranges_directories, temp_ocr_path)
+    # 四角形に基づいて画像を切り抜き、保存 & 情報をテキストファイルに保存
+    crop_save_and_check_text_with_coordinates(image, squares, ranges_directories, temp_ocr_path)
     
     return extract_text(dirs, temp_ocr_path)
