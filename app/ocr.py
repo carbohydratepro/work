@@ -7,7 +7,7 @@ import pytesseract
 from pytesseract import Output
 from PIL import Image, ImageEnhance, ImageFilter
 
-
+    
 def find_largest_rectangle(image, temp_ocr_path):
     '''最大長方形の抽出'''
     # 画像を読み込み、前処理
@@ -68,42 +68,84 @@ def crop_right_percentage(image_path, percentage, temp_ocr_path):
 
 
 
-def crop_and_save(image, rectangles, ranges_directories, temp_ocr_path):
-    """ 四角形に基づいて画像を切り抜き、保存（幅の条件付き） """
-    img_width = image.shape[1]
+# def crop_and_save(image, rectangles, ranges_directories, temp_ocr_path):
+#     """ 四角形に基づいて画像を切り抜き、保存（幅の条件付き） """
+#     img_width = image.shape[1]
 
-    for i, rect in enumerate(rectangles):
-        x, y, w, h = cv2.boundingRect(rect)
-        rect_width_percent = (w / img_width) * 100
+#     for i, rect in enumerate(rectangles):
+#         x, y, w, h = cv2.boundingRect(rect)
+#         rect_width_percent = (w / img_width) * 100
 
-        for (min_percent, max_percent, width_percent_range, output_dir) in ranges_directories:
-            min_x = int(img_width * min_percent / 100)
-            max_x = int(img_width * max_percent / 100)
+#         for (min_percent, max_percent, width_percent_range, output_dir) in ranges_directories:
+#             min_x = int(img_width * min_percent / 100)
+#             max_x = int(img_width * max_percent / 100)
             
-            # 四角形の幅が指定されたパーセント範囲内にあるかチェック
-            if width_percent_range[0] <= rect_width_percent <= width_percent_range[1]:
-                if x >= min_x and x + w <= max_x:
-                    if not os.path.exists(f"{temp_ocr_path}/{output_dir}"):
-                        os.makedirs(f"{temp_ocr_path}/{output_dir}")
+#             # 四角形の幅が指定されたパーセント範囲内にあるかチェック
+#             if width_percent_range[0] <= rect_width_percent <= width_percent_range[1]:
+#                 if x >= min_x and x + w <= max_x:
+#                     if not os.path.exists(f"{temp_ocr_path}/{output_dir}"):
+#                         os.makedirs(f"{temp_ocr_path}/{output_dir}")
 
-                    cropped = image[y:y+h, x:x+w]
-                    cv2.imwrite(f'{temp_ocr_path}/{output_dir}/rectangle_{i+1}.jpg', cropped)
+#                     cropped = image[y:y+h, x:x+w]
+#                     cv2.imwrite(f'{temp_ocr_path}/{output_dir}/rectangle_{i+1}.jpg', cropped)
 
-def save_rectangles(rectangles, img_width, ranges_directories, temp_ocr_path):
-    """ 四角形の座標をファイルに保存（幅の条件付き） """
-    for (min_percent, max_percent, width_percent_range, output_dir) in ranges_directories:
-        min_x = int(img_width * min_percent / 100)
-        max_x = int(img_width * max_percent / 100)
+# def save_rectangles(rectangles, img_width, ranges_directories, temp_ocr_path):
+#     """ 四角形の座標をファイルに保存（幅の条件付き） """
+#     for (min_percent, max_percent, width_percent_range, output_dir) in ranges_directories:
+#         min_x = int(img_width * min_percent / 100)
+#         max_x = int(img_width * max_percent / 100)
 
-        with open(f'{temp_ocr_path}/{output_dir}/rectangles.txt', 'w') as f:
-            for i, rect in enumerate(rectangles):
-                x, y, w, h = cv2.boundingRect(rect)
-                rect_width_percent = (w / img_width) * 100
+#         with open(f'{temp_ocr_path}/{output_dir}/rectangles.txt', 'w') as f:
+#             for i, rect in enumerate(rectangles):
+#                 x, y, w, h = cv2.boundingRect(rect)
+#                 rect_width_percent = (w / img_width) * 100
 
-                if x >= min_x and x + w <= max_x and width_percent_range[0] <= rect_width_percent <= width_percent_range[1]:
-                    coordinates = ' '.join([f'({cx},{cy})' for cx, cy in rect])
-                    f.write(f'{coordinates}{i+1}\n')
+#                 if x >= min_x and x + w <= max_x and width_percent_range[0] <= rect_width_percent <= width_percent_range[1]:
+#                     coordinates = ' '.join([f'({cx},{cy})' for cx, cy in rect])
+#                     f.write(f'{coordinates}{i+1}\n')
 
+# ==================debug=====================
+
+def visualize_squares(image, squares, temp_ocr_path):
+    # 元の画像のコピーを作成
+    vis_image = image.copy()
+    
+    # 検出された四角形を描画
+    for square in squares:
+        # 四角形の頂点を整数に変換（描画のため）
+        pts = square.astype(int).reshape((-1, 1, 2))
+        # 四角形を緑色で描画
+        cv2.polylines(vis_image, [pts], True, (0, 255, 0), 2)
+
+    # デバッグ用の画像を保存
+    debug_image_path = os.path.join(temp_ocr_path, "debug_image_squares.jpg")
+    cv2.imwrite(debug_image_path, vis_image)
+
+def visualize_contours(bin_image, image, temp_ocr_path):
+    """
+    二値化された画像から輪郭を検出し、それらを元の画像に描画して表示する。
+    
+    Parameters:
+    - bin_image: 二値化された画像（白黒）
+    - image: 元の画像（カラー）
+    """
+    # 輪郭を検出
+    contours, _ = cv2.findContours(bin_image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+
+    # 元の画像のコピーを作成（輪郭を描画するため）
+    vis_image = image.copy()
+
+    # 検出された輪郭を描画
+    cv2.drawContours(vis_image, contours, -1, (0, 255, 0), 2)  # 緑色の輪郭
+
+    # デバッグ用の画像を保存
+    debug_image_path = os.path.join(temp_ocr_path, "debug_image_contours.jpg")
+    cv2.imwrite(debug_image_path, vis_image)
+    
+
+# ==========================================
+    
+    
 
 def findSquares(bin_image, image, cond_area=1000):
     squares = []
@@ -123,9 +165,13 @@ def contains_text(image):
     extracted_text = pytesseract.image_to_string(image)
     return len(extracted_text.strip()) > 0
 
+
 def crop_save_and_check_text_with_coordinates(image, rectangles, ranges_directories, temp_ocr_path):
     """矩形に基づいて画像を切り抜き、保存（幅の条件付き）、テキストが含まれているか判定し、座標を保存"""
     img_width = image.shape[1]
+
+    # デバッグ用の画像を作成（元の画像をコピー）
+    debug_image = image.copy()
 
     for (min_percent, max_percent, width_percent_range, output_dir) in ranges_directories:
         min_x = int(img_width * min_percent / 100)
@@ -142,11 +188,18 @@ def crop_save_and_check_text_with_coordinates(image, rectangles, ranges_director
                     cropped_image = image[y:y+h, x:x+w]
                     cropped_pil_image = Image.fromarray(cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB))
                     
+                    # デバッグ用の画像に矩形を描画
+                    cv2.rectangle(debug_image, (x, y), (x+w, y+h), (0, 255, 0), 3)
+                    
                     if contains_text(cropped_pil_image):
                         filename = f'rectangle_{i+1}.jpg'
                         cv2.imwrite(os.path.join(temp_ocr_path, output_dir, filename), cropped_image)
                         coordinates = ' '.join([f'({cx},{cy})' for cx, cy in rect])
                         f.write(f'{coordinates} - {filename}\n')
+
+    # デバッグ用の画像を保存
+    debug_image_path = os.path.join(temp_ocr_path, "debug_image.jpg")
+    cv2.imwrite(debug_image_path, debug_image)
 
 def extract_text(dirs, temp_ocr_path):
     '''OCRを行う関数(多分精度重視)'''
@@ -253,12 +306,19 @@ def ocr_carbon(image):
     crop_right_percentage(image_path, percentage, temp_ocr_path)
     
     image = cv2.imread(f'{temp_ocr_path}/cropped_image_del.jpg', cv2.IMREAD_COLOR)
-
+    
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
     _, bw = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    # または、適応的二値化を使用する場合
+    # bw = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+    #                            cv2.THRESH_BINARY, 11, 2)
     squares = findSquares(bw, image)
 
-    img_width = image.shape[1]
+    # debug用の関数
+    visualize_squares(image, squares, temp_ocr_path)
+    visualize_contours(bw, image, temp_ocr_path)
+    
     
     # 範囲と保存ディレクトリのリスト
     # 例: [(0, 50, 'img1'), (50, 100, 'img2')] は、最初の50%をimg1に、次の50%をimg2に保存
