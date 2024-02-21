@@ -105,10 +105,45 @@ def crop_right_percentage(image_path, percentage, temp_ocr_path):
 #                     f.write(f'{coordinates}{i+1}\n')
 
 # ==================debug=====================
+def generate_missing_squares(rectangles):
+    """抜けている矩形を推定して生成"""
+    y_coords = [rect[0][1] for rect in rectangles]
+    y_diffs = np.diff(sorted(y_coords, reverse=True))
+    y_diffs = np.abs(y_diffs)  # これで y_diffs は NumPy 配列
+
+    common_diff = np.median(y_diffs[y_diffs > 0])  # 0より大きい差分のみを考慮して中央値を計算
+    
+    if np.isinf(common_diff) or common_diff == 0:
+        # common_diffが無限大または0の場合、適切な処理を行う
+        # 例: common_diffにデフォルト値を設定
+        common_diff = 50  # 適当なデフォルト値
+
+    print(common_diff)
+    missing_squares = []
+    for i in range(len(y_coords) - 1):
+        current_diff = y_coords[i] - y_coords[i+1]
+        print(current_diff)
+        if current_diff > common_diff * 1.5: # 幅が平均値の1.5倍であった場合、欠損個所と断定
+            num_missing = int(round(current_diff / common_diff)) - 1
+            print(num_missing)
+            for j in range(int(num_missing)):
+                y_top = y_coords[i] - common_diff * (j + 1)
+                new_square = np.array([[rectangles[i][0][0], y_top],
+                                       [rectangles[i][1][0], y_top + common_diff - 1],
+                                       [rectangles[i][2][0], y_top + common_diff - 1],
+                                       [rectangles[i][3][0], y_top]], dtype=np.int32)
+                missing_squares.append(new_square)
+    
+    print(missing_squares)
+    return missing_squares
+
 
 def visualize_squares(image, squares, temp_ocr_path):
     # 元の画像のコピーを作成
     vis_image = image.copy()
+
+    # 欠損した矩形部分を補完
+    # squares += generate_missing_squares(squares)
     
     # 検出された四角形を描画
     for square in squares:
@@ -176,26 +211,34 @@ def crop_save_and_check_text_with_coordinates(image, rectangles, ranges_director
     for (min_percent, max_percent, width_percent_range, output_dir) in ranges_directories:
         min_x = int(img_width * min_percent / 100)
         max_x = int(img_width * max_percent / 100)
+
+        # 幅のパーセンテージとx座標の範囲でフィルタリング
+        filtered_rectangles = [
+            rect for rect in rectangles
+            if width_percent_range[0] <= (cv2.boundingRect(rect)[2] / img_width) * 100 <= width_percent_range[1]
+            and min_x <= cv2.boundingRect(rect)[0] <= max_x
+        ]
+
         if not os.path.exists(f"{temp_ocr_path}/{output_dir}"):
             os.makedirs(f"{temp_ocr_path}/{output_dir}")
-        coordinates_file_path = f'{temp_ocr_path}/{output_dir}/rectangles.txt'
-        with open(coordinates_file_path, 'w') as f:
-            for i, rect in enumerate(rectangles):
-                x, y, w, h = cv2.boundingRect(rect)
-                rect_width_percent = (w / img_width) * 100
+        coordinates_file_path = os.path.join(temp_ocr_path, output_dir, "rectangles.txt")
 
-                if width_percent_range[0] <= rect_width_percent <= width_percent_range[1] and x >= min_x and x + w <= max_x:
-                    cropped_image = image[y:y+h, x:x+w]
-                    cropped_pil_image = Image.fromarray(cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB))
-                    
-                    # デバッグ用の画像に矩形を描画
-                    cv2.rectangle(debug_image, (x, y), (x+w, y+h), (0, 255, 0), 3)
-                    
-                    if contains_text(cropped_pil_image):
-                        filename = f'rectangle_{i+1}.jpg'
-                        cv2.imwrite(os.path.join(temp_ocr_path, output_dir, filename), cropped_image)
-                        coordinates = ' '.join([f'({cx},{cy})' for cx, cy in rect])
-                        f.write(f'{coordinates} - {filename}\n')
+        filtered_rectangles += generate_missing_squares(filtered_rectangles)
+        
+        with open(coordinates_file_path, 'w') as f:
+            for i, rect in enumerate(filtered_rectangles):
+                x, y, w, h = cv2.boundingRect(rect)
+                cropped_image = image[y:y+h, x:x+w]
+                cropped_pil_image = Image.fromarray(cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB))
+
+                # デバッグ用の画像に矩形を描画
+                cv2.rectangle(debug_image, (x, y), (x+w, y+h), (0, 255, 0), 3)
+
+                if contains_text(cropped_pil_image):
+                    filename = f'rectangle_{i+1}.jpg'
+                    cv2.imwrite(os.path.join(temp_ocr_path, output_dir, filename), cropped_image)
+                    coordinates = ' '.join([f'({cx},{cy})' for cx, cy in rect])
+                    f.write(f"{coordinates} - {filename}\n")
 
     # デバッグ用の画像を保存
     debug_image_path = os.path.join(temp_ocr_path, "debug_image.jpg")
@@ -309,7 +352,9 @@ def ocr_carbon(image):
     
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     
-    _, bw = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    # 手動で閾値を設定
+    _, bw = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+    
     # または、適応的二値化を使用する場合
     # bw = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
     #                            cv2.THRESH_BINARY, 11, 2)
@@ -318,6 +363,9 @@ def ocr_carbon(image):
     # debug用の関数
     visualize_squares(image, squares, temp_ocr_path)
     visualize_contours(bw, image, temp_ocr_path)
+    
+    debug_image_path = os.path.join(temp_ocr_path, "debug_bw.jpg")
+    cv2.imwrite(debug_image_path, bw)
     
     
     # 範囲と保存ディレクトリのリスト
@@ -342,3 +390,4 @@ def ocr_carbon(image):
 
     
     return associations
+
